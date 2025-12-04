@@ -15,10 +15,12 @@ use App\Filament\Widgets\MonthlyIncomeComparisonChart;
 use App\Filament\Widgets\RecentVariableExpenses;
 use App\Filament\Widgets\RecentVariableIncomes;
 use App\Filament\Widgets\UpcomingFixedExpenses;
+use App\Http\Middleware\SetLocale;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -78,9 +80,18 @@ class AppPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                SetLocale::class,
             ])
             ->authMiddleware([
                 Authenticate::class,
+            ])
+            ->userMenuItems([
+                MenuItem::make()
+                    ->label(fn () => app()->getLocale() === 'pt_BR' ? 'English' : 'Português')
+                    ->icon('heroicon-o-language')
+                    ->url(fn () => route('locale.switch', [
+                        'locale' => app()->getLocale() === 'pt_BR' ? 'en' : 'pt_BR'
+                    ])),
             ]);
     }
 }
