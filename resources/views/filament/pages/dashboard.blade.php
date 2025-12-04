@@ -1,34 +1,31 @@
 <x-filament-panels::page x-data="{ activeTab: $wire.entangle('activeTab') }">
     <div class="mb-6">
-        <div class="border-b border-gray-200 dark:border-gray-700">
-            <nav class="-mb-px flex space-x-8">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-1">
+            <nav class="flex gap-1">
                 <button
                     type="button"
                     @click="activeTab = 'receitas'"
-                    :class="activeTab === 'receitas'
-                        ? 'border-primary-500 text-primary-600 dark:text-primary-400'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
-                    class="whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition"
+                    :style="activeTab === 'receitas' ? 'background-color: rgb(34, 197, 94); color: white; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border-radius: 9999px; padding: 12px 32px;' : 'border-radius: 9999px; padding: 12px 32px;'"
+                    class="flex-1 whitespace-nowrap text-sm font-semibold transition-all duration-200 ease-in-out"
+                    :class="activeTab !== 'receitas' ? 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700' : ''"
                 >
                     Receitas
                 </button>
                 <button
                     type="button"
                     @click="activeTab = 'despesas'"
-                    :class="activeTab === 'despesas'
-                        ? 'border-primary-500 text-primary-600 dark:text-primary-400'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
-                    class="whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition"
+                    :style="activeTab === 'despesas' ? 'background-color: rgb(239, 68, 68); color: white; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border-radius: 9999px; padding: 12px 32px;' : 'border-radius: 9999px; padding: 12px 32px;'"
+                    class="flex-1 whitespace-nowrap text-sm font-semibold transition-all duration-200 ease-in-out"
+                    :class="activeTab !== 'despesas' ? 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700' : ''"
                 >
                     Despesas
                 </button>
                 <button
                     type="button"
                     @click="activeTab = 'comparativo'"
-                    :class="activeTab === 'comparativo'
-                        ? 'border-primary-500 text-primary-600 dark:text-primary-400'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
-                    class="whitespace-nowrap border-b-2 px-1 py-4 text-sm font-medium transition"
+                    :style="activeTab === 'comparativo' ? 'background-color: rgb(245, 158, 11); color: white; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border-radius: 9999px; padding: 12px 32px;' : 'border-radius: 9999px; padding: 12px 32px;'"
+                    class="flex-1 whitespace-nowrap text-sm font-semibold transition-all duration-200 ease-in-out"
+                    :class="activeTab !== 'comparativo' ? 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700' : ''"
                 >
                     Comparativo
                 </button>
