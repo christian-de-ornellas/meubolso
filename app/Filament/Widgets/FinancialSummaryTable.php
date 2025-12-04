@@ -25,6 +25,11 @@ class FinancialSummaryTable extends TableWidget
         return null;
     }
 
+    public function getTableRecordKey($record): string
+    {
+        return $record['key'];
+    }
+
     public function getTableRecords(): Collection
     {
         $records = collect();
@@ -49,7 +54,8 @@ class FinancialSummaryTable extends TableWidget
             $balance = $totalIncomes - $totalExpenses;
             $savingsRate = $totalIncomes > 0 ? ($balance / $totalIncomes) * 100 : 0;
 
-            $records->push((object) [
+            $records->push([
+                'key' => $date->format('Y-m'),
                 'month' => $date->format('M/Y'),
                 'incomes' => $totalIncomes,
                 'expenses' => $totalExpenses,
