@@ -52,6 +52,7 @@
             :data="$this->getWidgetData()"
             :widgets="[
                 \App\Filament\Widgets\FinancialStatsOverview::class,
+                \App\Filament\Widgets\MonthlyPaymentSummary::class,
                 \App\Filament\Widgets\ExpensesByCategoryChart::class,
                 \App\Filament\Widgets\UpcomingFixedExpenses::class,
                 \App\Filament\Widgets\RecentVariableExpenses::class,
