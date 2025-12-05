@@ -10,6 +10,8 @@ class ListFixedExpenses extends ListRecords
 {
     protected static string $resource = FixedExpenseResource::class;
 
+    protected string $view = 'filament.resources.fixed-expenses.pages.list-fixed-expenses';
+
     protected function getHeaderActions(): array
     {
         return [

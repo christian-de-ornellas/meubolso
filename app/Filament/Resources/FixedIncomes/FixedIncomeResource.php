@@ -35,6 +35,11 @@ class FixedIncomeResource extends Resource
 
     protected static ?int $navigationSort = 4;
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return FixedIncomeForm::configure($schema);

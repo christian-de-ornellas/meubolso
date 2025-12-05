@@ -10,6 +10,8 @@ class ListVariableIncomes extends ListRecords
 {
     protected static string $resource = VariableIncomeResource::class;
 
+    protected string $view = 'filament.resources.variable-incomes.pages.list-variable-incomes';
+
     protected function getHeaderActions(): array
     {
         return [

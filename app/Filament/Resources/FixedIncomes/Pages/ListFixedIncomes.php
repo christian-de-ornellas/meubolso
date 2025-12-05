@@ -10,6 +10,8 @@ class ListFixedIncomes extends ListRecords
 {
     protected static string $resource = FixedIncomeResource::class;
 
+    protected string $view = 'filament.resources.fixed-incomes.pages.list-fixed-incomes';
+
     protected function getHeaderActions(): array
     {
         return [
