@@ -18,12 +18,11 @@ class UpcomingFixedExpenses extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            ->heading('Despesas Fixas Vencendo nos Próximos 30 Dias')
+            ->heading('Próximos Vencimentos de Despesas Fixas (30 Dias)')
             ->query(
                 FixedExpense::query()
-                    ->expiringSoon(30)
+                    ->active()
                     ->with('category')
-                    ->orderBy('end_date', 'asc')
             )
             ->columns([
                 TextColumn::make('description')
@@ -43,20 +42,66 @@ class UpcomingFixedExpenses extends TableWidget
                     ->money('BRL')
                     ->sortable(),
 
-                TextColumn::make('end_date')
-                    ->label('Data de Vencimento')
-                    ->date('d/m/Y')
+                TextColumn::make('next_due_date')
+                    ->label('Próximo Vencimento')
+                    ->getStateUsing(function ($record) {
+                        $today = now();
+                        $dayOfMonth = $record->start_date->day;
+
+                        // Calcular o próximo vencimento
+                        $nextDue = now()->day($dayOfMonth);
+
+                        // Se o dia já passou neste mês, pega o próximo mês
+                        if ($nextDue->isPast()) {
+                            $nextDue = $nextDue->addMonth();
+                        }
+
+                        return $nextDue->format('d/m/Y');
+                    })
                     ->sortable()
                     ->color('warning')
-                    ->icon('heroicon-o-exclamation-triangle')
+                    ->icon('heroicon-o-calendar')
                     ->iconPosition(IconPosition::Before),
 
-                TextColumn::make('days_until_expiry')
+                TextColumn::make('days_until_due')
                     ->label('Dias Restantes')
-                    ->getStateUsing(fn ($record) => $record->end_date->diffInDays(now()) . ' dias')
+                    ->getStateUsing(function ($record) {
+                        $today = now()->startOfDay();
+                        $dayOfMonth = $record->start_date->day;
+
+                        $nextDue = now()->day($dayOfMonth)->startOfDay();
+                        if ($nextDue->isPast()) {
+                            $nextDue = $nextDue->addMonth();
+                        }
+
+                        $daysUntil = (int) $today->diffInDays($nextDue);
+
+                        return $daysUntil . ($daysUntil === 1 ? ' dia' : ' dias');
+                    })
                     ->badge()
-                    ->color(fn ($record) => $record->end_date->diffInDays(now()) <= 7 ? 'danger' : 'warning'),
+                    ->color(function ($record) {
+                        $today = now()->startOfDay();
+                        $dayOfMonth = $record->start_date->day;
+
+                        $nextDue = now()->day($dayOfMonth)->startOfDay();
+                        if ($nextDue->isPast()) {
+                            $nextDue = $nextDue->addMonth();
+                        }
+
+                        $daysUntil = (int) $today->diffInDays($nextDue);
+
+                        if ($daysUntil <= 7) return 'danger';
+                        if ($daysUntil <= 15) return 'warning';
+                        return 'success';
+                    }),
             ])
+            ->defaultSort(fn ($query) => $query->orderByRaw('
+                CASE
+                    WHEN (CAST(strftime("%d", start_date) AS INTEGER) - CAST(strftime("%d", "now") AS INTEGER)) >= 0
+                    THEN (CAST(strftime("%d", start_date) AS INTEGER) - CAST(strftime("%d", "now") AS INTEGER))
+                    ELSE (CAST(strftime("%d", start_date) AS INTEGER) - CAST(strftime("%d", "now") AS INTEGER) + 30)
+                END
+            '))
             ->paginated([5, 10, 25]);
     }
 }

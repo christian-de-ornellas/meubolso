@@ -28,8 +28,15 @@ class MonthlyIncomeComparisonChart extends ChartWidget
             // Formatar o label do mês
             $months[] = $date->format('M/Y');
 
-            // Calcular total de receitas fixas ativas
-            $fixedTotal = FixedIncome::active()->sum('amount');
+            // Calcular total de receitas fixas que estavam ativas naquele mês
+            $fixedTotal = FixedIncome::query()
+                ->where('status', true)
+                ->where('start_date', '<=', $date->endOfMonth())
+                ->where(function ($query) use ($date) {
+                    $query->whereNull('end_date')
+                        ->orWhere('end_date', '>=', $date->startOfMonth());
+                })
+                ->sum('amount');
 
             // Calcular total de receitas variáveis do mês
             $variableTotal = VariableIncome::byMonth($month, $year)->sum('amount');
