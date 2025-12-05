@@ -10,9 +10,9 @@ use Filament\Widgets\ChartWidget;
 
 class ExpensesByCategoryChart extends ChartWidget
 {
-    protected ?string $heading = 'Despesas por Categoria (Mês Atual)';
-
     protected static ?int $sort = 2;
+
+    protected ?string $grandTotal = null;
 
     protected function getData(): array
     {
@@ -24,7 +24,9 @@ class ExpensesByCategoryChart extends ChartWidget
         $data = [];
         $labels = [];
         $colors = [];
+        $categoryTotals = [];
 
+        // Primeiro, calcular todos os totais
         foreach ($categories as $category) {
             $fixedTotal = $category->fixedExpenses()
                 ->where('status', true)
@@ -38,19 +40,34 @@ class ExpensesByCategoryChart extends ChartWidget
             $total = $fixedTotal + $variableTotal;
 
             if ($total > 0) {
-                $labels[] = $category->name;
-                $data[] = $total;
-                $colors[] = $category->color ?? '#3b82f6';
+                $categoryTotals[] = [
+                    'name' => $category->name,
+                    'total' => $total,
+                    'color' => $category->color ?? '#3b82f6',
+                ];
             }
+        }
+
+        // Calcular o total geral
+        $grandTotal = array_sum(array_column($categoryTotals, 'total'));
+        $this->grandTotal = 'R$ ' . number_format($grandTotal, 2, ',', '.');
+
+        // Gerar labels com percentuais
+        foreach ($categoryTotals as $cat) {
+            $percentage = $grandTotal > 0 ? ($cat['total'] / $grandTotal) * 100 : 0;
+            $labels[] = $cat['name'] . ' (' . number_format($percentage, 1) . '%)';
+            $data[] = $cat['total'];
+            $colors[] = $cat['color'];
         }
 
         return [
             'datasets' => [
                 [
-                    'label' => 'Despesas',
+                    'label' => 'Valor',
                     'data' => $data,
                     'backgroundColor' => $colors,
                     'borderColor' => $colors,
+                    'borderWidth' => 2,
                 ],
             ],
             'labels' => $labels,
@@ -70,7 +87,27 @@ class ExpensesByCategoryChart extends ChartWidget
                     'display' => true,
                     'position' => 'bottom',
                 ],
+                'tooltip' => [
+                    'enabled' => true,
+                ],
             ],
+            'maintainAspectRatio' => true,
+            'responsive' => true,
         ];
+    }
+
+    public function getHeading(): ?string
+    {
+        return 'Despesas por Categoria (Mês Atual)';
+    }
+
+    public function getDescription(): ?string
+    {
+        // Garantir que getData() foi chamado
+        if ($this->grandTotal === null) {
+            $this->getData();
+        }
+
+        return 'Total: ' . $this->grandTotal;
     }
 }
