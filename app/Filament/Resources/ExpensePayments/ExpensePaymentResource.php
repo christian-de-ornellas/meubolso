@@ -25,7 +25,7 @@ class ExpensePaymentResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static ?string $navigationLabel = 'Checklist Mensal';
+    protected static ?string $navigationLabel = 'Pagamentos';
 
     protected static ?string $modelLabel = 'Pagamento';
 
