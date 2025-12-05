@@ -31,6 +31,25 @@ class ExpensePaymentResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Checklist de Pagamentos';
 
+    public static function getNavigationBadge(): ?string
+    {
+        $currentMonth = now()->month;
+        $currentYear = now()->year;
+
+        $unpaidCount = \App\Models\ExpensePayment::query()
+            ->where('month', $currentMonth)
+            ->where('year', $currentYear)
+            ->where('paid', false)
+            ->count();
+
+        return $unpaidCount > 0 ? (string) $unpaidCount : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
+
     protected static string|UnitEnum|null $navigationGroup = 'Gestão Financeira';
 
     protected static ?int $navigationSort = 3;

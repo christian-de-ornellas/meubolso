@@ -15,12 +15,39 @@ class ExpensePaymentForm
     {
         return $schema
             ->components([
+                Select::make('expense_type')
+                    ->label('Tipo de Despesa')
+                    ->options([
+                        'fixed' => 'Despesa Fixa',
+                        'variable' => 'Despesa Variável',
+                    ])
+                    ->default(fn ($record) => $record?->fixed_expense_id ? 'fixed' : 'variable')
+                    ->required()
+                    ->live()
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        // Limpar campos ao trocar tipo
+                        $set('fixed_expense_id', null);
+                        $set('variable_expense_id', null);
+                    })
+                    ->dehydrated(false)
+                    ->columnSpanFull(),
+
                 Select::make('fixed_expense_id')
                     ->label('Despesa Fixa')
                     ->relationship('fixedExpense', 'description')
                     ->searchable()
                     ->preload()
-                    ->required()
+                    ->visible(fn ($get) => $get('expense_type') === 'fixed')
+                    ->required(fn ($get) => $get('expense_type') === 'fixed')
+                    ->columnSpanFull(),
+
+                Select::make('variable_expense_id')
+                    ->label('Despesa Variável')
+                    ->relationship('variableExpense', 'description')
+                    ->searchable()
+                    ->preload()
+                    ->visible(fn ($get) => $get('expense_type') === 'variable')
+                    ->required(fn ($get) => $get('expense_type') === 'variable')
                     ->columnSpanFull(),
 
                 Select::make('month')

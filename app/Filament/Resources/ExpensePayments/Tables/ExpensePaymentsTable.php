@@ -17,21 +17,27 @@ class ExpensePaymentsTable
     {
         return $table
             ->columns([
-                TextColumn::make('fixedExpense.description')
-                    ->label('Despesa')
-                    ->searchable()
-                    ->sortable()
-                    ->weight('bold'),
-
-                TextColumn::make('fixedExpense.category.name')
-                    ->label('Categoria')
+                TextColumn::make('expense_type')
+                    ->label('Tipo')
                     ->badge()
-                    ->color(fn ($record) => $record->fixedExpense->category->color ?? 'gray')
-                    ->searchable()
+                    ->color(fn (string $state): string => $state === 'Fixa' ? 'info' : 'warning')
                     ->sortable(),
 
-                TextColumn::make('fixedExpense.amount')
+                TextColumn::make('expense_description')
+                    ->label('Despesa')
+                    ->getStateUsing(fn ($record) => $record->expense?->description ?? '-')
+                    ->searchable(['fixed_expenses.description', 'variable_expenses.description'])
+                    ->weight('bold'),
+
+                TextColumn::make('expense_category')
+                    ->label('Categoria')
+                    ->badge()
+                    ->getStateUsing(fn ($record) => $record->expense?->category?->name ?? '-')
+                    ->color(fn ($record) => $record->expense?->category?->color ?? 'gray'),
+
+                TextColumn::make('expense_amount')
                     ->label('Valor')
+                    ->getStateUsing(fn ($record) => $record->expense?->amount ?? 0)
                     ->money('BRL')
                     ->sortable(),
 
@@ -102,7 +108,7 @@ class ExpensePaymentsTable
             ->recordActions([
                 EditAction::make(),
             ])
-            ->defaultSort('fixedExpense.description', 'asc')
+            ->defaultSort('id', 'asc')
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

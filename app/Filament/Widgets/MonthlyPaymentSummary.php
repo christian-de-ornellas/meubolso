@@ -16,12 +16,14 @@ class MonthlyPaymentSummary extends StatsOverviewWidget
         $currentMonth = now()->month;
         $currentYear = now()->year;
 
-        // Total de despesas fixas ativas
-        $totalExpenses = FixedExpense::active()->sum('amount');
+        // Total de despesas fixas ativas + variáveis do mês
+        $totalFixedExpenses = FixedExpense::active()->sum('amount');
+        $totalVariableExpenses = \App\Models\VariableExpense::byMonth($currentMonth, $currentYear)->sum('amount');
+        $totalExpenses = $totalFixedExpenses + $totalVariableExpenses;
 
         // Pagamentos do mês atual
-        $payments = ExpensePayment::currentMonth()->get();
-        $totalPaid = $payments->where('paid', true)->sum(fn ($payment) => $payment->fixedExpense->amount);
+        $payments = ExpensePayment::currentMonth()->with(['fixedExpense', 'variableExpense'])->get();
+        $totalPaid = $payments->where('paid', true)->sum(fn ($payment) => $payment->expense?->amount ?? 0);
         $totalToPay = $totalExpenses - $totalPaid;
         $percentagePaid = $totalExpenses > 0 ? ($totalPaid / $totalExpenses) * 100 : 0;
 
@@ -31,8 +33,8 @@ class MonthlyPaymentSummary extends StatsOverviewWidget
         $unpaidCount = $totalPaymentsCount - $paidCount;
 
         return [
-            Stat::make('Total de Despesas Fixas', 'R$ ' . number_format($totalExpenses, 2, ',', '.'))
-                ->description($totalPaymentsCount . ' despesas no checklist')
+            Stat::make('Total de Despesas', 'R$ ' . number_format($totalExpenses, 2, ',', '.'))
+                ->description($totalPaymentsCount . ' despesas no checklist (fixas + variáveis)')
                 ->descriptionIcon('heroicon-o-rectangle-stack')
                 ->color('primary'),
 

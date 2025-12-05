@@ -15,6 +15,7 @@ class ExpensePayment extends Model
     protected $fillable = [
         'user_id',
         'fixed_expense_id',
+        'variable_expense_id',
         'month',
         'year',
         'payment_date',
@@ -55,6 +56,23 @@ class ExpensePayment extends Model
     public function fixedExpense(): BelongsTo
     {
         return $this->belongsTo(FixedExpense::class);
+    }
+
+    public function variableExpense(): BelongsTo
+    {
+        return $this->belongsTo(VariableExpense::class);
+    }
+
+    // Helper para pegar a despesa relacionada (fixa ou variável)
+    public function getExpenseAttribute()
+    {
+        return $this->fixedExpense ?? $this->variableExpense;
+    }
+
+    // Helper para pegar o tipo da despesa
+    public function getExpenseTypeAttribute(): string
+    {
+        return $this->fixed_expense_id ? 'Fixa' : 'Variável';
     }
 
     // Scopes

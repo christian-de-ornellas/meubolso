@@ -96,13 +96,28 @@ class ListExpensePayments extends ListRecords
                 'paid' => false,
             ]);
         }
+
+        // Buscar todas as despesas variáveis do usuário para este mês/ano
+        $variableExpenses = \App\Models\VariableExpense::byMonth($month, $year)->get();
+
+        foreach ($variableExpenses as $expense) {
+            // Verificar se já existe um registro de pagamento para esta despesa neste mês
+            ExpensePayment::firstOrCreate([
+                'user_id' => auth()->id(),
+                'variable_expense_id' => $expense->id,
+                'month' => $month,
+                'year' => $year,
+            ], [
+                'paid' => false,
+            ]);
+        }
     }
 
     protected function getTableQuery(): Builder
     {
         // Por padrão, mostrar apenas o mês atual
         return parent::getTableQuery()
-            ->with(['fixedExpense.category'])
+            ->with(['fixedExpense.category', 'variableExpense.category'])
             ->when(
                 !request()->has('tableFilters'),
                 fn (Builder $query) => $query->currentMonth()
