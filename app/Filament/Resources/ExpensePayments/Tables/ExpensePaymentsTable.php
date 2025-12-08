@@ -26,7 +26,16 @@ class ExpensePaymentsTable
                 TextColumn::make('expense_description')
                     ->label('Despesa')
                     ->getStateUsing(fn ($record) => $record->expense?->description ?? '-')
-                    ->searchable(['fixed_expenses.description', 'variable_expenses.description'])
+                    ->searchable(query: function ($query, $search) {
+                        return $query->where(function ($query) use ($search) {
+                            $query->whereHas('fixedExpense', function ($query) use ($search) {
+                                $query->where('description', 'like', "%{$search}%");
+                            })
+                            ->orWhereHas('variableExpense', function ($query) use ($search) {
+                                $query->where('description', 'like', "%{$search}%");
+                            });
+                        });
+                    })
                     ->weight('bold'),
 
                 TextColumn::make('expense_category')
