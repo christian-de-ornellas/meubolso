@@ -6,7 +6,6 @@ use App\Filament\Resources\ExpensePayments\ExpensePaymentResource;
 use App\Models\ExpensePayment;
 use App\Models\FixedExpense;
 use Filament\Actions\Action;
-use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -55,6 +54,7 @@ class ListExpensePayments extends ListRecords
                             for ($i = $currentYear - 1; $i <= $currentYear + 2; $i++) {
                                 $years[$i] = $i;
                             }
+
                             return $years;
                         })
                         ->default(now()->year)
@@ -82,34 +82,42 @@ class ListExpensePayments extends ListRecords
 
     protected function generatePaymentsForMonth(int $month, int $year): void
     {
+        $restoredCount = 0;
+        $createdCount = 0;
+
         // Buscar todas as despesas fixas ativas do usuário
         $fixedExpenses = FixedExpense::active()->get();
 
         foreach ($fixedExpenses as $expense) {
-            // Verificar se já existe um registro de pagamento para esta despesa neste mês
-            ExpensePayment::firstOrCreate([
-                'user_id' => auth()->id(),
-                'fixed_expense_id' => $expense->id,
-                'month' => $month,
-                'year' => $year,
-            ], [
-                'paid' => false,
-            ]);
+            [$payment, $wasRestored] = ExpensePayment::createOrRestoreForFixedExpense($expense, $month, $year);
+
+            if ($wasRestored) {
+                $restoredCount++;
+            } else {
+                $createdCount++;
+            }
         }
 
         // Buscar todas as despesas variáveis do usuário para este mês/ano
         $variableExpenses = \App\Models\VariableExpense::byMonth($month, $year)->get();
 
         foreach ($variableExpenses as $expense) {
-            // Verificar se já existe um registro de pagamento para esta despesa neste mês
-            ExpensePayment::firstOrCreate([
-                'user_id' => auth()->id(),
-                'variable_expense_id' => $expense->id,
-                'month' => $month,
-                'year' => $year,
-            ], [
-                'paid' => false,
-            ]);
+            [$payment, $wasRestored] = ExpensePayment::createOrRestoreForVariableExpense($expense, $month, $year);
+
+            if ($wasRestored) {
+                $restoredCount++;
+            } else {
+                $createdCount++;
+            }
+        }
+
+        // Show notification if payments were restored
+        if ($restoredCount > 0) {
+            \Filament\Notifications\Notification::make()
+                ->title('Pagamentos restaurados')
+                ->body("{$restoredCount} pagamento(s) previamente excluído(s) foram restaurados para {$month}/{$year}")
+                ->info()
+                ->send();
         }
     }
 
@@ -119,7 +127,7 @@ class ListExpensePayments extends ListRecords
         return parent::getTableQuery()
             ->with(['fixedExpense.category', 'variableExpense.category'])
             ->when(
-                !request()->has('tableFilters'),
+                ! request()->has('tableFilters'),
                 fn (Builder $query) => $query->currentMonth()
             );
     }
