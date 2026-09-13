@@ -39,4 +39,9 @@ class Category extends Model
     {
         return $this->hasMany(Budget::class);
     }
+
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class);
+    }
 }

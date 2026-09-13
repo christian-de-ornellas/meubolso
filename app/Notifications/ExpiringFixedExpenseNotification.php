@@ -7,15 +7,13 @@ use Illuminate\Notifications\Notification;
 
 class ExpiringFixedExpenseNotification extends Notification
 {
-    protected ?string $customId = null;
-
     public function __construct(
         protected FixedExpense $expense
     ) {}
 
     public function setId(string $id): static
     {
-        $this->customId = $id;
+        $this->id = $id;
         return $this;
     }
 
@@ -26,6 +24,10 @@ class ExpiringFixedExpenseNotification extends Notification
 
     public function toDatabase($notifiable): array
     {
+        if (! $this->expense->end_date) {
+            return [];
+        }
+
         $daysLeft = now()->diffInDays($this->expense->end_date);
 
         return \Filament\Notifications\Notification::make()

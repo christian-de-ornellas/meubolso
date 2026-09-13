@@ -7,15 +7,13 @@ use Illuminate\Notifications\Notification;
 
 class UpcomingSubscriptionNotification extends Notification
 {
-    protected ?string $customId = null;
-
     public function __construct(
         protected Subscription $subscription
     ) {}
 
     public function setId(string $id): static
     {
-        $this->customId = $id;
+        $this->id = $id;
         return $this;
     }
 

@@ -7,8 +7,6 @@ use Illuminate\Notifications\Notification;
 
 class GoalMilestoneNotification extends Notification
 {
-    protected ?string $customId = null;
-
     public function __construct(
         protected FinancialGoal $goal,
         protected int $milestone
@@ -16,7 +14,7 @@ class GoalMilestoneNotification extends Notification
 
     public function setId(string $id): static
     {
-        $this->customId = $id;
+        $this->id = $id;
         return $this;
     }
 

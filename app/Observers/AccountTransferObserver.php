@@ -17,4 +17,10 @@ class AccountTransferObserver
         $transfer->fromAccount()->increment('current_balance', $transfer->amount);
         $transfer->toAccount()->decrement('current_balance', $transfer->amount);
     }
+
+    public function restored(AccountTransfer $transfer): void
+    {
+        $transfer->fromAccount()->decrement('current_balance', $transfer->amount);
+        $transfer->toAccount()->increment('current_balance', $transfer->amount);
+    }
 }

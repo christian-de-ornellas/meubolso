@@ -7,15 +7,13 @@ use Illuminate\Notifications\Notification;
 
 class BudgetExceededNotification extends Notification
 {
-    protected ?string $customId = null;
-
     public function __construct(
         protected Budget $budget
     ) {}
 
     public function setId(string $id): static
     {
-        $this->customId = $id;
+        $this->id = $id;
         return $this;
     }
 
@@ -28,7 +26,7 @@ class BudgetExceededNotification extends Notification
     {
         return \Filament\Notifications\Notification::make()
             ->title('Orçamento Excedido')
-            ->body("O orçamento da categoria \"{$this->budget->category->name}\" foi excedido. Gasto: {$this->budget->percentage_used}%.")
+            ->body("O orçamento da categoria \"{$this->budget->category?->name ?? 'Sem categoria'}\" foi excedido. Gasto: {$this->budget->percentage_used}%.")
             ->icon('heroicon-o-exclamation-circle')
             ->danger()
             ->getDatabaseMessage();

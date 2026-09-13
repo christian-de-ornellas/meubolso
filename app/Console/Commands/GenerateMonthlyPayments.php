@@ -4,8 +4,10 @@ namespace App\Console\Commands;
 
 use App\Models\ExpensePayment;
 use App\Models\FixedExpense;
+use App\Models\User;
 use App\Models\VariableExpense;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Auth;
 
 class GenerateMonthlyPayments extends Command
 {
@@ -20,49 +22,57 @@ class GenerateMonthlyPayments extends Command
 
         $count = 0;
 
-        // Despesas fixas ativas
-        $fixedExpenses = FixedExpense::withoutGlobalScopes()->active()->get();
-        foreach ($fixedExpenses as $expense) {
-            $payment = ExpensePayment::withoutGlobalScopes()->firstOrCreate(
-                [
-                    'user_id' => $expense->user_id,
-                    'fixed_expense_id' => $expense->id,
-                    'month' => $month,
-                    'year' => $year,
-                ],
-                [
-                    'paid' => false,
-                ]
-            );
+        User::chunk(100, function ($users) use ($month, $year, &$count) {
+            foreach ($users as $user) {
+                Auth::setUser($user);
 
-            if ($payment->wasRecentlyCreated) {
-                $count++;
+                // Despesas fixas ativas
+                $fixedExpenses = FixedExpense::active()->get();
+                foreach ($fixedExpenses as $expense) {
+                    $payment = ExpensePayment::firstOrCreate(
+                        [
+                            'user_id' => $user->id,
+                            'fixed_expense_id' => $expense->id,
+                            'month' => $month,
+                            'year' => $year,
+                        ],
+                        [
+                            'paid' => false,
+                        ]
+                    );
+
+                    if ($payment->wasRecentlyCreated) {
+                        $count++;
+                    }
+                }
+
+                // Despesas variáveis do mês
+                $variableExpenses = VariableExpense::query()
+                    ->whereMonth('expense_date', $month)
+                    ->whereYear('expense_date', $year)
+                    ->get();
+
+                foreach ($variableExpenses as $expense) {
+                    $payment = ExpensePayment::firstOrCreate(
+                        [
+                            'user_id' => $user->id,
+                            'variable_expense_id' => $expense->id,
+                            'month' => $month,
+                            'year' => $year,
+                        ],
+                        [
+                            'paid' => false,
+                        ]
+                    );
+
+                    if ($payment->wasRecentlyCreated) {
+                        $count++;
+                    }
+                }
             }
-        }
+        });
 
-        // Despesas variáveis do mês
-        $variableExpenses = VariableExpense::withoutGlobalScopes()
-            ->whereMonth('expense_date', $month)
-            ->whereYear('expense_date', $year)
-            ->get();
-
-        foreach ($variableExpenses as $expense) {
-            $payment = ExpensePayment::withoutGlobalScopes()->firstOrCreate(
-                [
-                    'user_id' => $expense->user_id,
-                    'variable_expense_id' => $expense->id,
-                    'month' => $month,
-                    'year' => $year,
-                ],
-                [
-                    'paid' => false,
-                ]
-            );
-
-            if ($payment->wasRecentlyCreated) {
-                $count++;
-            }
-        }
+        Auth::forgetUser();
 
         $this->info("Criados {$count} pagamentos para {$month}/{$year}");
 

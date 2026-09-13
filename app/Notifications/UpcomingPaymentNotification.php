@@ -7,15 +7,13 @@ use Illuminate\Notifications\Notification;
 
 class UpcomingPaymentNotification extends Notification
 {
-    protected ?string $customId = null;
-
     public function __construct(
         protected ExpensePayment $payment
     ) {}
 
     public function setId(string $id): static
     {
-        $this->customId = $id;
+        $this->id = $id;
         return $this;
     }
 

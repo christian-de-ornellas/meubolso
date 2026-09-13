@@ -33,7 +33,7 @@ class VariableIncomeResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'Gestão Financeira';
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 6;
 
     public static function shouldRegisterNavigation(): bool
     {
