@@ -14,7 +14,7 @@ class IncomesManagement extends Page
 
     protected static ?string $title = 'Gestão de Receitas';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Gestão Financeira';
+    protected static string|UnitEnum|null $navigationGroup = 'Receitas';
 
     protected static ?int $navigationSort = 1;
 

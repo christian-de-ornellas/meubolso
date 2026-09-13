@@ -31,9 +31,9 @@ class FixedExpenseResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Despesas Fixas';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Gestão Financeira';
+    protected static string|UnitEnum|null $navigationGroup = 'Despesas';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 4;
 
     public static function shouldRegisterNavigation(): bool
     {

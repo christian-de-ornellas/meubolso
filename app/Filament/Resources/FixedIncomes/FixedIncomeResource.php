@@ -31,9 +31,9 @@ class FixedIncomeResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Receitas Fixas';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Gestão Financeira';
+    protected static string|UnitEnum|null $navigationGroup = 'Receitas';
 
-    protected static ?int $navigationSort = 5;
+    protected static ?int $navigationSort = 3;
 
     public static function shouldRegisterNavigation(): bool
     {

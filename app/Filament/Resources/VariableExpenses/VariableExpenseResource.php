@@ -31,9 +31,9 @@ class VariableExpenseResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Despesas Variáveis';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Gestão Financeira';
+    protected static string|UnitEnum|null $navigationGroup = 'Despesas';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 5;
 
     public static function shouldRegisterNavigation(): bool
     {

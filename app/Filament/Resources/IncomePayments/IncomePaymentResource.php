@@ -48,9 +48,9 @@ class IncomePaymentResource extends Resource
         return 'info';
     }
 
-    protected static string|UnitEnum|null $navigationGroup = 'Gestão Financeira';
+    protected static string|UnitEnum|null $navigationGroup = 'Receitas';
 
-    protected static ?int $navigationSort = 7;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
     {

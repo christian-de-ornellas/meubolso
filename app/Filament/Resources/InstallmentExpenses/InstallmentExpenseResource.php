@@ -31,9 +31,9 @@ class InstallmentExpenseResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Parcelamentos';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Gestão Financeira';
+    protected static string|UnitEnum|null $navigationGroup = 'Despesas';
 
-    protected static ?int $navigationSort = 8;
+    protected static ?int $navigationSort = 3;
 
     public static function form(Schema $schema): Schema
     {

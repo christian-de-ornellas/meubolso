@@ -31,9 +31,9 @@ class BudgetResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Orçamentos';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Gestão Financeira';
+    protected static string|UnitEnum|null $navigationGroup = 'Planejamento';
 
-    protected static ?int $navigationSort = 9;
+    protected static ?int $navigationSort = 1;
 
     public static function form(Schema $schema): Schema
     {

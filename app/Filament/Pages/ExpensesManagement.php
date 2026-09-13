@@ -14,9 +14,9 @@ class ExpensesManagement extends Page
 
     protected static ?string $title = 'Gestão de Despesas';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Gestão Financeira';
+    protected static string|UnitEnum|null $navigationGroup = 'Despesas';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 1;
 
     public static function shouldRegisterNavigation(): bool
     {

@@ -27,6 +27,7 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\MenuItem;
+use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -49,6 +50,13 @@ class AppPanelProvider extends PanelProvider
             ->registration()
             ->colors([
                 'primary' => Color::Amber,
+            ])
+            ->navigationGroups([
+                NavigationGroup::make('Receitas'),
+                NavigationGroup::make('Despesas'),
+                NavigationGroup::make('Contas'),
+                NavigationGroup::make('Planejamento'),
+                NavigationGroup::make('Configuração'),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
@@ -101,6 +109,10 @@ class AppPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->userMenuItems([
+                MenuItem::make()
+                    ->label('Tutorial')
+                    ->icon('heroicon-o-academic-cap')
+                    ->url('/app/tutorial'),
                 MenuItem::make()
                     ->label(fn () => app()->getLocale() === 'pt_BR' ? 'English' : 'Português')
                     ->icon('heroicon-o-language')

@@ -31,9 +31,9 @@ class VariableIncomeResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Receitas Variáveis';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Gestão Financeira';
+    protected static string|UnitEnum|null $navigationGroup = 'Receitas';
 
-    protected static ?int $navigationSort = 6;
+    protected static ?int $navigationSort = 4;
 
     public static function shouldRegisterNavigation(): bool
     {
