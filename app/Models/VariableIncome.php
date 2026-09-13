@@ -2,19 +2,20 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToAuthUser;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Auth;
 
 class VariableIncome extends Model
 {
-    use SoftDeletes;
+    use BelongsToAuthUser, Concerns\HasTags, SoftDeletes;
 
     protected $fillable = [
         'user_id',
         'income_category_id',
+        'account_id',
         'description',
         'amount',
         'income_date',
@@ -26,33 +27,9 @@ class VariableIncome extends Model
         return [
             'amount' => 'decimal:2',
             'income_date' => 'date',
-            'created_at' => 'datetime',
-            'updated_at' => 'datetime',
-            'deleted_at' => 'datetime',
         ];
     }
 
-    /**
-     * Global scope to filter by authenticated user
-     */
-    protected static function booted(): void
-    {
-        static::addGlobalScope('user', function (Builder $query) {
-            if (Auth::check()) {
-                $query->where('user_id', Auth::id());
-            }
-        });
-
-        static::creating(function (VariableIncome $income) {
-            if (Auth::check() && !$income->user_id) {
-                $income->user_id = Auth::id();
-            }
-        });
-    }
-
-    /**
-     * Relationships
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -63,9 +40,11 @@ class VariableIncome extends Model
         return $this->belongsTo(IncomeCategory::class);
     }
 
-    /**
-     * Scopes
-     */
+    public function account(): BelongsTo
+    {
+        return $this->belongsTo(Account::class);
+    }
+
     public function scopeByMonth(Builder $query, int $month, int $year): Builder
     {
         return $query->whereYear('income_date', $year)

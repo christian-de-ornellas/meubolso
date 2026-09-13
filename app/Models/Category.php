@@ -2,16 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
+use App\Traits\BelongsToAuthUser;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Auth;
 
 class Category extends Model
 {
-    use SoftDeletes;
+    use BelongsToAuthUser, SoftDeletes;
 
     protected $fillable = [
         'user_id',
@@ -21,36 +20,6 @@ class Category extends Model
         'icon',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'created_at' => 'datetime',
-            'updated_at' => 'datetime',
-            'deleted_at' => 'datetime',
-        ];
-    }
-
-    /**
-     * Global scope to filter by authenticated user
-     */
-    protected static function booted(): void
-    {
-        static::addGlobalScope('user', function (Builder $query) {
-            if (Auth::check()) {
-                $query->where('user_id', Auth::id());
-            }
-        });
-
-        static::creating(function (Category $category) {
-            if (Auth::check() && !$category->user_id) {
-                $category->user_id = Auth::id();
-            }
-        });
-    }
-
-    /**
-     * Relationships
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -64,5 +33,10 @@ class Category extends Model
     public function variableExpenses(): HasMany
     {
         return $this->hasMany(VariableExpense::class);
+    }
+
+    public function budgets(): HasMany
+    {
+        return $this->hasMany(Budget::class);
     }
 }

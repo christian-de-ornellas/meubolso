@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToAuthUser;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,17 +11,19 @@ use Illuminate\Support\Facades\Auth;
 
 class ExpensePayment extends Model
 {
-    use HasFactory;
+    use BelongsToAuthUser, HasFactory;
 
     protected $fillable = [
         'user_id',
         'fixed_expense_id',
         'variable_expense_id',
+        'account_id',
         'month',
         'year',
         'payment_date',
         'paid',
         'notes',
+        'attachment',
     ];
 
     protected $casts = [
@@ -30,24 +33,6 @@ class ExpensePayment extends Model
         'paid' => 'boolean',
     ];
 
-    protected static function booted(): void
-    {
-        // Global scope para filtrar por usuário autenticado
-        static::addGlobalScope('user', function (Builder $builder) {
-            if (Auth::check()) {
-                $builder->where('user_id', Auth::id());
-            }
-        });
-
-        // Preencher user_id automaticamente ao criar
-        static::creating(function (ExpensePayment $payment) {
-            if (Auth::check() && ! $payment->user_id) {
-                $payment->user_id = Auth::id();
-            }
-        });
-    }
-
-    // Relationships
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -63,19 +48,21 @@ class ExpensePayment extends Model
         return $this->belongsTo(VariableExpense::class);
     }
 
-    // Helper para pegar a despesa relacionada (fixa ou variável)
+    public function account(): BelongsTo
+    {
+        return $this->belongsTo(Account::class);
+    }
+
     public function getExpenseAttribute()
     {
         return $this->fixedExpense ?? $this->variableExpense;
     }
 
-    // Helper para pegar o tipo da despesa
     public function getExpenseTypeAttribute(): string
     {
         return $this->fixed_expense_id ? 'Fixa' : 'Variável';
     }
 
-    // Scopes
     public function scopeByMonth(Builder $query, int $month, int $year): Builder
     {
         return $query->where('month', $month)
@@ -99,7 +86,6 @@ class ExpensePayment extends Model
         return $query->byMonth($now->month, $now->year);
     }
 
-    // Helper methods
     public function getMonthNameAttribute(): string
     {
         $monthNames = [
@@ -125,9 +111,6 @@ class ExpensePayment extends Model
         return $this->month_name.'/'.$this->year;
     }
 
-    /**
-     * Create payment for a fixed expense if it doesn't already exist
-     */
     public static function createForFixedExpense(FixedExpense $expense, int $month, int $year): ExpensePayment
     {
         return static::firstOrCreate(
@@ -143,9 +126,6 @@ class ExpensePayment extends Model
         );
     }
 
-    /**
-     * Create payment for a variable expense if it doesn't already exist
-     */
     public static function createForVariableExpense(VariableExpense $expense, int $month, int $year): ExpensePayment
     {
         return static::firstOrCreate(

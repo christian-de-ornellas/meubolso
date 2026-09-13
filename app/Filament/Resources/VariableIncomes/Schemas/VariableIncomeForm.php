@@ -53,9 +53,24 @@ class VariableIncomeForm
                     ->default(now())
                     ->columnSpan(1),
 
+                Select::make('account_id')
+                    ->label('Conta')
+                    ->relationship('account', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->columnSpan(1),
+
                 Textarea::make('notes')
                     ->label('Observações')
                     ->rows(3)
+                    ->columnSpanFull(),
+
+                Select::make('tags')
+                    ->label('Tags')
+                    ->relationship('tags', 'name')
+                    ->multiple()
+                    ->searchable()
+                    ->preload()
                     ->columnSpanFull(),
             ]);
     }

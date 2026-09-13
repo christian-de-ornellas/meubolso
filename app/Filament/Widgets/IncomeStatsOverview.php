@@ -19,8 +19,7 @@ class IncomeStatsOverview extends StatsOverviewWidget
         $previousMonth = Carbon::now()->subMonth()->month;
         $previousYear = Carbon::now()->subMonth()->year;
 
-        // Totais do mês atual
-        $fixedIncomesThisMonth = FixedIncome::active()
+        $fixedIncomesThisMonth = FixedIncome::activeInMonth($currentMonth, $currentYear)
             ->sum('amount');
 
         $variableIncomesThisMonth = VariableIncome::byMonth($currentMonth, $currentYear)
@@ -28,8 +27,7 @@ class IncomeStatsOverview extends StatsOverviewWidget
 
         $totalThisMonth = $fixedIncomesThisMonth + $variableIncomesThisMonth;
 
-        // Totais do mês anterior
-        $fixedIncomesPrevMonth = FixedIncome::active()
+        $fixedIncomesPrevMonth = FixedIncome::activeInMonth($previousMonth, $previousYear)
             ->sum('amount');
 
         $variableIncomesPrevMonth = VariableIncome::byMonth($previousMonth, $previousYear)
@@ -37,24 +35,18 @@ class IncomeStatsOverview extends StatsOverviewWidget
 
         $totalPrevMonth = $fixedIncomesPrevMonth + $variableIncomesPrevMonth;
 
-        // Cálculo da diferença
         $difference = $totalThisMonth - $totalPrevMonth;
-        $percentageChange = $totalPrevMonth > 0
-            ? (($difference / $totalPrevMonth) * 100)
-            : 0;
 
         return [
-            Stat::make('Receitas Fixas Ativas', 'R$ ' . number_format($fixedIncomesThisMonth, 2, ',', '.'))
-                ->description('Total de receitas fixas ativas')
+            Stat::make('Receitas Fixas (Mês)', 'R$ ' . number_format($fixedIncomesThisMonth, 2, ',', '.'))
+                ->description('Total de receitas fixas ativas no mês')
                 ->descriptionIcon('heroicon-o-currency-dollar')
-                ->color('success')
-                ->chart([5, 3, 7, 4, 8, 6, 9, 7]),
+                ->color('success'),
 
             Stat::make('Receitas Variáveis (Mês)', 'R$ ' . number_format($variableIncomesThisMonth, 2, ',', '.'))
                 ->description('Total de receitas variáveis deste mês')
                 ->descriptionIcon('heroicon-o-banknotes')
-                ->color('primary')
-                ->chart([3, 5, 7, 4, 6, 8, 5, 9]),
+                ->color('primary'),
 
             Stat::make('Total Geral (Mês)', 'R$ ' . number_format($totalThisMonth, 2, ',', '.'))
                 ->description(
@@ -63,8 +55,7 @@ class IncomeStatsOverview extends StatsOverviewWidget
                     ' vs mês anterior'
                 )
                 ->descriptionIcon($difference >= 0 ? 'heroicon-o-arrow-trending-up' : 'heroicon-o-arrow-trending-down')
-                ->color($difference >= 0 ? 'success' : 'danger')
-                ->chart([4, 6, 5, 8, 7, 9, 8, 10]),
+                ->color($difference >= 0 ? 'success' : 'danger'),
         ];
     }
 }

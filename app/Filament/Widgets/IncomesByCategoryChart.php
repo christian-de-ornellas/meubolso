@@ -3,8 +3,6 @@
 namespace App\Filament\Widgets;
 
 use App\Models\IncomeCategory;
-use App\Models\FixedIncome;
-use App\Models\VariableIncome;
 use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
 
@@ -19,23 +17,33 @@ class IncomesByCategoryChart extends ChartWidget
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
 
-        $categories = IncomeCategory::with(['fixedIncomes', 'variableIncomes'])->get();
+        $start = Carbon::create($currentYear, $currentMonth, 1)->startOfMonth();
+        $end = Carbon::create($currentYear, $currentMonth, 1)->endOfMonth();
+
+        $categories = IncomeCategory::query()
+            ->withSum(
+                ['fixedIncomes as fixed_total' => fn ($q) => $q
+                    ->where('status', true)
+                    ->where('start_date', '<=', $end)
+                    ->where(fn ($q2) => $q2->whereNull('end_date')->orWhere('end_date', '>=', $start)),
+                ],
+                'amount'
+            )
+            ->withSum(
+                ['variableIncomes as variable_total' => fn ($q) => $q
+                    ->whereYear('income_date', $currentYear)
+                    ->whereMonth('income_date', $currentMonth),
+                ],
+                'amount'
+            )
+            ->get();
 
         $data = [];
         $labels = [];
         $colors = [];
 
         foreach ($categories as $category) {
-            $fixedTotal = $category->fixedIncomes()
-                ->where('status', true)
-                ->sum('amount');
-
-            $variableTotal = $category->variableIncomes()
-                ->whereYear('income_date', $currentYear)
-                ->whereMonth('income_date', $currentMonth)
-                ->sum('amount');
-
-            $total = $fixedTotal + $variableTotal;
+            $total = ($category->fixed_total ?? 0) + ($category->variable_total ?? 0);
 
             if ($total > 0) {
                 $labels[] = $category->name;

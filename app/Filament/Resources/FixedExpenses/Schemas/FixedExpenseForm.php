@@ -74,6 +74,28 @@ class FixedExpenseForm
                     ->default(true)
                     ->inline(false)
                     ->columnSpan(1),
+
+                Select::make('account_id')
+                    ->label('Conta')
+                    ->relationship('account', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->columnSpan(1),
+
+                Select::make('credit_card_id')
+                    ->label('Cartão de Crédito')
+                    ->relationship('creditCard', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->columnSpan(1),
+
+                Select::make('tags')
+                    ->label('Tags')
+                    ->relationship('tags', 'name')
+                    ->multiple()
+                    ->searchable()
+                    ->preload()
+                    ->columnSpanFull(),
             ]);
     }
 }

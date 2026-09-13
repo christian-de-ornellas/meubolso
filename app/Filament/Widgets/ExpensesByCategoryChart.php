@@ -3,8 +3,6 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Category;
-use App\Models\FixedExpense;
-use App\Models\VariableExpense;
 use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
 
@@ -19,25 +17,34 @@ class ExpensesByCategoryChart extends ChartWidget
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
 
-        $categories = Category::with(['fixedExpenses', 'variableExpenses'])->get();
+        $start = Carbon::create($currentYear, $currentMonth, 1)->startOfMonth();
+        $end = Carbon::create($currentYear, $currentMonth, 1)->endOfMonth();
+
+        $categories = Category::query()
+            ->withSum(
+                ['fixedExpenses as fixed_total' => fn ($q) => $q
+                    ->where('status', true)
+                    ->where('start_date', '<=', $end)
+                    ->where(fn ($q2) => $q2->whereNull('end_date')->orWhere('end_date', '>=', $start)),
+                ],
+                'amount'
+            )
+            ->withSum(
+                ['variableExpenses as variable_total' => fn ($q) => $q
+                    ->whereYear('expense_date', $currentYear)
+                    ->whereMonth('expense_date', $currentMonth),
+                ],
+                'amount'
+            )
+            ->get();
 
         $data = [];
         $labels = [];
         $colors = [];
         $categoryTotals = [];
 
-        // Primeiro, calcular todos os totais
         foreach ($categories as $category) {
-            $fixedTotal = $category->fixedExpenses()
-                ->where('status', true)
-                ->sum('amount');
-
-            $variableTotal = $category->variableExpenses()
-                ->whereYear('expense_date', $currentYear)
-                ->whereMonth('expense_date', $currentMonth)
-                ->sum('amount');
-
-            $total = $fixedTotal + $variableTotal;
+            $total = ($category->fixed_total ?? 0) + ($category->variable_total ?? 0);
 
             if ($total > 0) {
                 $categoryTotals[] = [
@@ -48,11 +55,9 @@ class ExpensesByCategoryChart extends ChartWidget
             }
         }
 
-        // Calcular o total geral
         $grandTotal = array_sum(array_column($categoryTotals, 'total'));
         $this->grandTotal = 'R$ ' . number_format($grandTotal, 2, ',', '.');
 
-        // Gerar labels com percentuais
         foreach ($categoryTotals as $cat) {
             $percentage = $grandTotal > 0 ? ($cat['total'] / $grandTotal) * 100 : 0;
             $labels[] = $cat['name'] . ' (' . number_format($percentage, 1) . '%)';
@@ -103,7 +108,6 @@ class ExpensesByCategoryChart extends ChartWidget
 
     public function getDescription(): ?string
     {
-        // Garantir que getData() foi chamado
         if ($this->grandTotal === null) {
             $this->getData();
         }

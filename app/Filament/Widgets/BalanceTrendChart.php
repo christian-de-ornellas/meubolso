@@ -20,26 +20,21 @@ class BalanceTrendChart extends ChartWidget
         $months = [];
         $balanceData = [];
 
-        // Gerar os últimos 6 meses
         for ($i = 5; $i >= 0; $i--) {
             $date = Carbon::now()->subMonths($i);
             $month = $date->month;
             $year = $date->year;
 
-            // Formatar o label do mês
             $months[] = $date->format('M/Y');
 
-            // Calcular total de receitas
-            $fixedIncomes = FixedIncome::active()->sum('amount');
+            $fixedIncomes = FixedIncome::activeInMonth($month, $year)->sum('amount');
             $variableIncomes = VariableIncome::byMonth($month, $year)->sum('amount');
             $totalIncomes = $fixedIncomes + $variableIncomes;
 
-            // Calcular total de despesas
-            $fixedExpenses = FixedExpense::active()->sum('amount');
+            $fixedExpenses = FixedExpense::activeInMonth($month, $year)->sum('amount');
             $variableExpenses = VariableExpense::byMonth($month, $year)->sum('amount');
             $totalExpenses = $fixedExpenses + $variableExpenses;
 
-            // Calcular saldo
             $balance = $totalIncomes - $totalExpenses;
             $balanceData[] = $balance;
         }

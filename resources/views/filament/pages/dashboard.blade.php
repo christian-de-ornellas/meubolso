@@ -29,6 +29,15 @@
                 >
                     Comparativo
                 </button>
+                <button
+                    type="button"
+                    @click="activeTab = 'projecao'"
+                    :style="activeTab === 'projecao' ? 'background-color: rgb(139, 92, 246); color: white; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border-radius: 9999px; padding: 12px 32px;' : 'border-radius: 9999px; padding: 12px 32px;'"
+                    class="flex-1 whitespace-nowrap text-sm font-semibold transition-all duration-200 ease-in-out"
+                    :class="activeTab !== 'projecao' ? 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700' : ''"
+                >
+                    Projeção
+                </button>
             </nav>
         </div>
     </div>
@@ -57,6 +66,7 @@
                 \App\Filament\Widgets\UpcomingFixedExpenses::class,
                 \App\Filament\Widgets\RecentVariableExpenses::class,
                 \App\Filament\Widgets\MonthlyComparisonChart::class,
+                \App\Filament\Widgets\BudgetProgressWidget::class,
             ]"
         />
     </div>
@@ -70,6 +80,20 @@
                 \App\Filament\Widgets\MonthlyComparisonBarChart::class,
                 \App\Filament\Widgets\BalanceTrendChart::class,
                 \App\Filament\Widgets\FinancialSummaryTable::class,
+                \App\Filament\Widgets\FinancialGoalsProgressWidget::class,
+            ]"
+        />
+    </div>
+
+    <div x-show="activeTab === 'projecao'" wire:key="projecao-widgets">
+        <x-filament-widgets::widgets
+            :columns="$this->getColumns()"
+            :data="$this->getWidgetData()"
+            :widgets="[
+                \App\Filament\Widgets\CashFlowProjectionChart::class,
+                \App\Filament\Widgets\AccountBalancesOverview::class,
+                \App\Filament\Widgets\CreditCardUsageOverview::class,
+                \App\Filament\Widgets\SubscriptionsCostOverview::class,
             ]"
         />
     </div>

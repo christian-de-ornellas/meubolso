@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ExpensePayments\Schemas;
 
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -92,9 +93,23 @@ class ExpensePaymentForm
                     ->displayFormat('d/m/Y')
                     ->columnSpanFull(),
 
+                Select::make('account_id')
+                    ->label('Conta')
+                    ->relationship('account', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->columnSpanFull(),
+
                 Textarea::make('notes')
                     ->label('Observações')
                     ->rows(3)
+                    ->columnSpanFull(),
+
+                FileUpload::make('attachment')
+                    ->label('Comprovante')
+                    ->acceptedFileTypes(['image/*', 'application/pdf'])
+                    ->maxSize(5120)
+                    ->directory('comprovantes')
                     ->columnSpanFull(),
             ]);
     }

@@ -4,6 +4,7 @@ namespace App\Filament\Widgets;
 
 use App\Models\ExpensePayment;
 use App\Models\FixedExpense;
+use App\Models\VariableExpense;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -16,18 +17,15 @@ class MonthlyPaymentSummary extends StatsOverviewWidget
         $currentMonth = now()->month;
         $currentYear = now()->year;
 
-        // Total de despesas fixas ativas + variáveis do mês
-        $totalFixedExpenses = FixedExpense::active()->sum('amount');
-        $totalVariableExpenses = \App\Models\VariableExpense::byMonth($currentMonth, $currentYear)->sum('amount');
+        $totalFixedExpenses = FixedExpense::activeInMonth($currentMonth, $currentYear)->sum('amount');
+        $totalVariableExpenses = VariableExpense::byMonth($currentMonth, $currentYear)->sum('amount');
         $totalExpenses = $totalFixedExpenses + $totalVariableExpenses;
 
-        // Pagamentos do mês atual
         $payments = ExpensePayment::currentMonth()->with(['fixedExpense', 'variableExpense'])->get();
         $totalPaid = $payments->where('paid', true)->sum(fn ($payment) => $payment->expense?->amount ?? 0);
         $totalToPay = $totalExpenses - $totalPaid;
         $percentagePaid = $totalExpenses > 0 ? ($totalPaid / $totalExpenses) * 100 : 0;
 
-        // Conta quantas despesas foram pagas vs total
         $totalPaymentsCount = $payments->count();
         $paidCount = $payments->where('paid', true)->count();
         $unpaidCount = $totalPaymentsCount - $paidCount;
@@ -41,8 +39,7 @@ class MonthlyPaymentSummary extends StatsOverviewWidget
             Stat::make('Pago no Mês', 'R$ ' . number_format($totalPaid, 2, ',', '.'))
                 ->description($paidCount . ' de ' . $totalPaymentsCount . ' pagamentos realizados')
                 ->descriptionIcon('heroicon-o-check-circle')
-                ->color('success')
-                ->chart([$paidCount, $unpaidCount]),
+                ->color('success'),
 
             Stat::make('A Pagar', 'R$ ' . number_format($totalToPay, 2, ',', '.'))
                 ->description($unpaidCount . ' despesas pendentes')
@@ -52,8 +49,7 @@ class MonthlyPaymentSummary extends StatsOverviewWidget
             Stat::make('Percentual Pago', number_format($percentagePaid, 1) . '%')
                 ->description($percentagePaid >= 100 ? 'Tudo pago!' : 'Faltam ' . number_format(100 - $percentagePaid, 1) . '%')
                 ->descriptionIcon($percentagePaid >= 100 ? 'heroicon-o-check-badge' : 'heroicon-o-arrow-trending-up')
-                ->color($percentagePaid >= 100 ? 'success' : ($percentagePaid >= 50 ? 'warning' : 'danger'))
-                ->chart([$percentagePaid, 100 - $percentagePaid]),
+                ->color($percentagePaid >= 100 ? 'success' : ($percentagePaid >= 50 ? 'warning' : 'danger')),
         ];
     }
 }

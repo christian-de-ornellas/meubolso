@@ -19,26 +19,15 @@ class MonthlyIncomeComparisonChart extends ChartWidget
         $fixedData = [];
         $variableData = [];
 
-        // Gerar os últimos 6 meses
         for ($i = 5; $i >= 0; $i--) {
             $date = Carbon::now()->subMonths($i);
             $month = $date->month;
             $year = $date->year;
 
-            // Formatar o label do mês
             $months[] = $date->format('M/Y');
 
-            // Calcular total de receitas fixas que estavam ativas naquele mês
-            $fixedTotal = FixedIncome::query()
-                ->where('status', true)
-                ->where('start_date', '<=', $date->endOfMonth())
-                ->where(function ($query) use ($date) {
-                    $query->whereNull('end_date')
-                        ->orWhere('end_date', '>=', $date->startOfMonth());
-                })
-                ->sum('amount');
+            $fixedTotal = FixedIncome::activeInMonth($month, $year)->sum('amount');
 
-            // Calcular total de receitas variáveis do mês
             $variableTotal = VariableIncome::byMonth($month, $year)->sum('amount');
 
             $fixedData[] = $fixedTotal;

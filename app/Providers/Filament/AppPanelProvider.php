@@ -2,9 +2,14 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\AccountBalancesOverview;
 use App\Filament\Widgets\BalanceStatsOverview;
 use App\Filament\Widgets\BalanceTrendChart;
+use App\Filament\Widgets\BudgetProgressWidget;
+use App\Filament\Widgets\CashFlowProjectionChart;
+use App\Filament\Widgets\CreditCardUsageOverview;
 use App\Filament\Widgets\ExpensesByCategoryChart;
+use App\Filament\Widgets\FinancialGoalsProgressWidget;
 use App\Filament\Widgets\FinancialStatsOverview;
 use App\Filament\Widgets\FinancialSummaryTable;
 use App\Filament\Widgets\IncomesByCategoryChart;
@@ -14,6 +19,7 @@ use App\Filament\Widgets\MonthlyComparisonChart;
 use App\Filament\Widgets\MonthlyIncomeComparisonChart;
 use App\Filament\Widgets\RecentVariableExpenses;
 use App\Filament\Widgets\RecentVariableIncomes;
+use App\Filament\Widgets\SubscriptionsCostOverview;
 use App\Filament\Widgets\UpcomingFixedExpenses;
 use App\Http\Middleware\SetLocale;
 use Filament\Http\Middleware\Authenticate;
@@ -50,6 +56,7 @@ class AppPanelProvider extends PanelProvider
                 \App\Filament\Pages\Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
+            ->databaseNotifications()
             ->widgets([
                 // Tab Receitas
                 IncomeStatsOverview::class,
@@ -63,12 +70,20 @@ class AppPanelProvider extends PanelProvider
                 UpcomingFixedExpenses::class,
                 RecentVariableExpenses::class,
                 MonthlyComparisonChart::class,
+                BudgetProgressWidget::class,
 
                 // Tab Comparativo
                 BalanceStatsOverview::class,
                 MonthlyComparisonBarChart::class,
                 BalanceTrendChart::class,
                 FinancialSummaryTable::class,
+                FinancialGoalsProgressWidget::class,
+
+                // Tab Projeção
+                CashFlowProjectionChart::class,
+                AccountBalancesOverview::class,
+                CreditCardUsageOverview::class,
+                SubscriptionsCostOverview::class,
             ])
             ->middleware([
                 EncryptCookies::class,

@@ -2,21 +2,23 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToAuthUser;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Auth;
 
 class FixedExpense extends Model
 {
-    use SoftDeletes;
+    use BelongsToAuthUser, Concerns\HasTags, SoftDeletes;
 
     protected $fillable = [
         'user_id',
         'category_id',
+        'account_id',
+        'credit_card_id',
         'description',
         'amount',
         'start_date',
@@ -32,33 +34,9 @@ class FixedExpense extends Model
             'start_date' => 'date',
             'end_date' => 'date',
             'status' => 'boolean',
-            'created_at' => 'datetime',
-            'updated_at' => 'datetime',
-            'deleted_at' => 'datetime',
         ];
     }
 
-    /**
-     * Global scope to filter by authenticated user
-     */
-    protected static function booted(): void
-    {
-        static::addGlobalScope('user', function (Builder $query) {
-            if (Auth::check()) {
-                $query->where('user_id', Auth::id());
-            }
-        });
-
-        static::creating(function (FixedExpense $expense) {
-            if (Auth::check() && !$expense->user_id) {
-                $expense->user_id = Auth::id();
-            }
-        });
-    }
-
-    /**
-     * Relationships
-     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -69,17 +47,34 @@ class FixedExpense extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function account(): BelongsTo
+    {
+        return $this->belongsTo(Account::class);
+    }
+
+    public function creditCard(): BelongsTo
+    {
+        return $this->belongsTo(CreditCard::class);
+    }
+
     public function payments(): HasMany
     {
         return $this->hasMany(ExpensePayment::class);
     }
 
-    /**
-     * Scopes
-     */
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', true);
+    }
+
+    public function scopeActiveInMonth(Builder $query, int $month, int $year): Builder
+    {
+        $start = Carbon::create($year, $month, 1)->startOfMonth();
+        $end = Carbon::create($year, $month, 1)->endOfMonth();
+
+        return $query->where('status', true)
+            ->where('start_date', '<=', $end)
+            ->where(fn ($q) => $q->whereNull('end_date')->orWhere('end_date', '>=', $start));
     }
 
     public function scopeExpiringSoon(Builder $query, int $days = 30): Builder
@@ -98,12 +93,9 @@ class FixedExpense extends Model
             ->whereMonth('start_date', $month);
     }
 
-    /**
-     * Check if expense is expiring soon
-     */
     public function isExpiringSoon(int $days = 30): bool
     {
-        if (!$this->end_date || !$this->status) {
+        if (! $this->end_date || ! $this->status) {
             return false;
         }
 

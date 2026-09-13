@@ -16,6 +16,13 @@
                 >
                     Despesas Variáveis
                 </a>
+                <a
+                    href="{{ route('filament.app.resources.installment-expenses.index') }}"
+                    style="border-radius: 9999px; padding: 12px 32px;"
+                    class="flex-1 text-center whitespace-nowrap text-sm font-semibold transition-all duration-200 ease-in-out text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+                >
+                    Parcelamentos
+                </a>
             </nav>
         </div>
     </div>

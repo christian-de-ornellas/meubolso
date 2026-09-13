@@ -21,7 +21,6 @@ class FinancialSummaryTable extends TableWidget
 
     protected function getTableQuery(): ?Builder
     {
-        // Retornando null porque vamos usar getTableRecords() ao invés disso
         return null;
     }
 
@@ -34,23 +33,19 @@ class FinancialSummaryTable extends TableWidget
     {
         $records = collect();
 
-        // Gerar os últimos 6 meses
         for ($i = 5; $i >= 0; $i--) {
             $date = Carbon::now()->subMonths($i);
             $month = $date->month;
             $year = $date->year;
 
-            // Calcular receitas
-            $fixedIncomes = FixedIncome::active()->sum('amount');
+            $fixedIncomes = FixedIncome::activeInMonth($month, $year)->sum('amount');
             $variableIncomes = VariableIncome::byMonth($month, $year)->sum('amount');
             $totalIncomes = $fixedIncomes + $variableIncomes;
 
-            // Calcular despesas
-            $fixedExpenses = FixedExpense::active()->sum('amount');
+            $fixedExpenses = FixedExpense::activeInMonth($month, $year)->sum('amount');
             $variableExpenses = VariableExpense::byMonth($month, $year)->sum('amount');
             $totalExpenses = $fixedExpenses + $variableExpenses;
 
-            // Calcular saldo e taxa
             $balance = $totalIncomes - $totalExpenses;
             $savingsRate = $totalIncomes > 0 ? ($balance / $totalIncomes) * 100 : 0;
 

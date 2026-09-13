@@ -5,7 +5,10 @@ namespace App\Filament\Resources\ExpensePayments\Pages;
 use App\Filament\Resources\ExpensePayments\ExpensePaymentResource;
 use App\Models\ExpensePayment;
 use App\Models\FixedExpense;
+use App\Models\VariableExpense;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Select;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -17,7 +20,6 @@ class ListExpensePayments extends ListRecords
     {
         parent::mount();
 
-        // Gerar automaticamente registros para despesas fixas ativas do mês atual
         $this->generateCurrentMonthPayments();
     }
 
@@ -28,7 +30,7 @@ class ListExpensePayments extends ListRecords
                 ->label('Gerar Checklist para Outro Mês')
                 ->icon('heroicon-o-calendar')
                 ->form([
-                    \Filament\Forms\Components\Select::make('month')
+                    Select::make('month')
                         ->label('Mês')
                         ->options([
                             1 => 'Janeiro',
@@ -46,7 +48,7 @@ class ListExpensePayments extends ListRecords
                         ])
                         ->default(now()->month)
                         ->required(),
-                    \Filament\Forms\Components\Select::make('year')
+                    Select::make('year')
                         ->label('Ano')
                         ->options(function () {
                             $currentYear = now()->year;
@@ -63,7 +65,7 @@ class ListExpensePayments extends ListRecords
                 ->action(function (array $data) {
                     $this->generatePaymentsForMonth($data['month'], $data['year']);
 
-                    \Filament\Notifications\Notification::make()
+                    Notification::make()
                         ->title('Checklist gerado')
                         ->body("Checklist criado para {$data['month']}/{$data['year']}")
                         ->success()
@@ -77,20 +79,22 @@ class ListExpensePayments extends ListRecords
         $currentMonth = now()->month;
         $currentYear = now()->year;
 
+        if (ExpensePayment::byMonth($currentMonth, $currentYear)->exists()) {
+            return;
+        }
+
         $this->generatePaymentsForMonth($currentMonth, $currentYear);
     }
 
     protected function generatePaymentsForMonth(int $month, int $year): void
     {
-        // Buscar todas as despesas fixas ativas do usuário
-        $fixedExpenses = FixedExpense::active()->get();
+        $fixedExpenses = FixedExpense::activeInMonth($month, $year)->get();
 
         foreach ($fixedExpenses as $expense) {
             ExpensePayment::createForFixedExpense($expense, $month, $year);
         }
 
-        // Buscar todas as despesas variáveis do usuário para este mês/ano
-        $variableExpenses = \App\Models\VariableExpense::byMonth($month, $year)->get();
+        $variableExpenses = VariableExpense::byMonth($month, $year)->get();
 
         foreach ($variableExpenses as $expense) {
             ExpensePayment::createForVariableExpense($expense, $month, $year);
@@ -99,7 +103,6 @@ class ListExpensePayments extends ListRecords
 
     protected function getTableQuery(): Builder
     {
-        // Por padrão, mostrar apenas o mês atual
         return parent::getTableQuery()
             ->with(['fixedExpense.category', 'variableExpense.category'])
             ->when(

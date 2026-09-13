@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\ExpensePayments\Tables;
 
+use App\Filament\Exports\ExpensePaymentExporter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ExportBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -120,6 +122,8 @@ class ExpensePaymentsTable
             ->defaultSort('id', 'asc')
             ->toolbarActions([
                 BulkActionGroup::make([
+                    ExportBulkAction::make()
+                        ->exporter(ExpensePaymentExporter::class),
                     DeleteBulkAction::make(),
                 ]),
             ]);

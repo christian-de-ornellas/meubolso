@@ -2,9 +2,14 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Widgets\AccountBalancesOverview;
 use App\Filament\Widgets\BalanceStatsOverview;
 use App\Filament\Widgets\BalanceTrendChart;
+use App\Filament\Widgets\BudgetProgressWidget;
+use App\Filament\Widgets\CashFlowProjectionChart;
+use App\Filament\Widgets\CreditCardUsageOverview;
 use App\Filament\Widgets\ExpensesByCategoryChart;
+use App\Filament\Widgets\FinancialGoalsProgressWidget;
 use App\Filament\Widgets\FinancialStatsOverview;
 use App\Filament\Widgets\FinancialSummaryTable;
 use App\Filament\Widgets\IncomesByCategoryChart;
@@ -14,6 +19,7 @@ use App\Filament\Widgets\MonthlyComparisonChart;
 use App\Filament\Widgets\MonthlyIncomeComparisonChart;
 use App\Filament\Widgets\RecentVariableExpenses;
 use App\Filament\Widgets\RecentVariableIncomes;
+use App\Filament\Widgets\SubscriptionsCostOverview;
 use App\Filament\Widgets\UpcomingFixedExpenses;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Livewire\Attributes\Url;
@@ -33,7 +39,6 @@ class Dashboard extends BaseDashboard
 
     public function updatedActiveTab()
     {
-        // Força atualização quando a aba muda
         $this->dispatch('activeTabUpdated');
     }
 
@@ -57,12 +62,20 @@ class Dashboard extends BaseDashboard
                 UpcomingFixedExpenses::class,
                 RecentVariableExpenses::class,
                 MonthlyComparisonChart::class,
+                BudgetProgressWidget::class,
             ],
             'comparativo' => [
                 BalanceStatsOverview::class,
                 MonthlyComparisonBarChart::class,
                 BalanceTrendChart::class,
                 FinancialSummaryTable::class,
+                FinancialGoalsProgressWidget::class,
+            ],
+            'projecao' => [
+                CashFlowProjectionChart::class,
+                AccountBalancesOverview::class,
+                CreditCardUsageOverview::class,
+                SubscriptionsCostOverview::class,
             ],
             default => [
                 IncomeStatsOverview::class,
