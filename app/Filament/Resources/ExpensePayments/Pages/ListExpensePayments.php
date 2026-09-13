@@ -82,42 +82,18 @@ class ListExpensePayments extends ListRecords
 
     protected function generatePaymentsForMonth(int $month, int $year): void
     {
-        $restoredCount = 0;
-        $createdCount = 0;
-
         // Buscar todas as despesas fixas ativas do usuário
         $fixedExpenses = FixedExpense::active()->get();
 
         foreach ($fixedExpenses as $expense) {
-            [$payment, $wasRestored] = ExpensePayment::createOrRestoreForFixedExpense($expense, $month, $year);
-
-            if ($wasRestored) {
-                $restoredCount++;
-            } else {
-                $createdCount++;
-            }
+            ExpensePayment::createForFixedExpense($expense, $month, $year);
         }
 
         // Buscar todas as despesas variáveis do usuário para este mês/ano
         $variableExpenses = \App\Models\VariableExpense::byMonth($month, $year)->get();
 
         foreach ($variableExpenses as $expense) {
-            [$payment, $wasRestored] = ExpensePayment::createOrRestoreForVariableExpense($expense, $month, $year);
-
-            if ($wasRestored) {
-                $restoredCount++;
-            } else {
-                $createdCount++;
-            }
-        }
-
-        // Show notification if payments were restored
-        if ($restoredCount > 0) {
-            \Filament\Notifications\Notification::make()
-                ->title('Pagamentos restaurados')
-                ->body("{$restoredCount} pagamento(s) previamente excluído(s) foram restaurados para {$month}/{$year}")
-                ->info()
-                ->send();
+            ExpensePayment::createForVariableExpense($expense, $month, $year);
         }
     }
 

@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\ExpensePayments\Schemas;
 
-use App\Models\ExpensePayment;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
@@ -35,9 +34,6 @@ class ExpensePaymentInfolist
                 TextEntry::make('updated_at')
                     ->dateTime()
                     ->placeholder('-'),
-                TextEntry::make('deleted_at')
-                    ->dateTime()
-                    ->visible(fn (ExpensePayment $record): bool => $record->trashed()),
             ]);
     }
 }

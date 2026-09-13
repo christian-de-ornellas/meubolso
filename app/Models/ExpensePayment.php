@@ -6,12 +6,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
 class ExpensePayment extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $fillable = [
         'user_id',
@@ -127,87 +126,38 @@ class ExpensePayment extends Model
     }
 
     /**
-     * Find existing payment (including soft-deleted) or restore if deleted
+     * Create payment for a fixed expense if it doesn't already exist
      */
-    public static function findOrRestorePayment(int $userId, ?int $fixedExpenseId, ?int $variableExpenseId, int $month, int $year): ?ExpensePayment
+    public static function createForFixedExpense(FixedExpense $expense, int $month, int $year): ExpensePayment
     {
-        $query = static::withTrashed()
-            ->where('user_id', $userId)
-            ->where('month', $month)
-            ->where('year', $year);
-
-        if ($fixedExpenseId) {
-            $query->where('fixed_expense_id', $fixedExpenseId);
-        } elseif ($variableExpenseId) {
-            $query->where('variable_expense_id', $variableExpenseId);
-        }
-
-        $existingPayment = $query->first();
-
-        if ($existingPayment && $existingPayment->trashed()) {
-            // Restore the soft-deleted record and reset payment status
-            $existingPayment->restore();
-            $existingPayment->update([
+        return static::firstOrCreate(
+            [
+                'user_id' => Auth::id(),
+                'fixed_expense_id' => $expense->id,
+                'month' => $month,
+                'year' => $year,
+            ],
+            [
                 'paid' => false,
-                'payment_date' => null,
-                'notes' => null,
-            ]);
-        }
-
-        return $existingPayment;
+            ]
+        );
     }
 
     /**
-     * Create or restore payment for a fixed expense
-     *
-     * @return array [payment, wasRestored]
+     * Create payment for a variable expense if it doesn't already exist
      */
-    public static function createOrRestoreForFixedExpense(FixedExpense $expense, int $month, int $year): array
+    public static function createForVariableExpense(VariableExpense $expense, int $month, int $year): ExpensePayment
     {
-        $userId = Auth::id();
-
-        $existingPayment = static::findOrRestorePayment($userId, $expense->id, null, $month, $year);
-
-        if ($existingPayment) {
-            // Check if it was just restored (trashed before the call)
-            return [$existingPayment, $existingPayment->updated_at->isToday()];
-        }
-
-        $newPayment = static::create([
-            'user_id' => $userId,
-            'fixed_expense_id' => $expense->id,
-            'month' => $month,
-            'year' => $year,
-            'paid' => false,
-        ]);
-
-        return [$newPayment, false];
-    }
-
-    /**
-     * Create or restore payment for a variable expense
-     *
-     * @return array [payment, wasRestored]
-     */
-    public static function createOrRestoreForVariableExpense(VariableExpense $expense, int $month, int $year): array
-    {
-        $userId = Auth::id();
-
-        $existingPayment = static::findOrRestorePayment($userId, null, $expense->id, $month, $year);
-
-        if ($existingPayment) {
-            // Check if it was just restored (trashed before the call)
-            return [$existingPayment, $existingPayment->updated_at->isToday()];
-        }
-
-        $newPayment = static::create([
-            'user_id' => $userId,
-            'variable_expense_id' => $expense->id,
-            'month' => $month,
-            'year' => $year,
-            'paid' => false,
-        ]);
-
-        return [$newPayment, false];
+        return static::firstOrCreate(
+            [
+                'user_id' => Auth::id(),
+                'variable_expense_id' => $expense->id,
+                'month' => $month,
+                'year' => $year,
+            ],
+            [
+                'paid' => false,
+            ]
+        );
     }
 }
