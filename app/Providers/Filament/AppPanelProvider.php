@@ -48,6 +48,10 @@ class AppPanelProvider extends PanelProvider
             ->path('app')
             ->login()
             ->registration()
+            ->brandName('MeuBolso')
+            ->darkMode()
+            ->font('Instrument Sans')
+            ->favicon(asset('favicon.svg'))
             ->colors([
                 'primary' => Color::Amber,
             ])
