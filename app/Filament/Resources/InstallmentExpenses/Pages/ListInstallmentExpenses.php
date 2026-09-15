@@ -10,6 +10,8 @@ class ListInstallmentExpenses extends ListRecords
 {
     protected static string $resource = InstallmentExpenseResource::class;
 
+    protected string $view = 'filament.resources.installment-expenses.pages.list-installment-expenses';
+
     protected function getHeaderActions(): array
     {
         return [

@@ -15,8 +15,8 @@
     }">
 
         {{-- Hero --}}
-        <div style="position: relative; overflow: hidden; border-radius: 0.75rem; border: 1px solid rgba(255,255,255,0.07); padding: 2rem 1.75rem;"
-             class="bg-white dark:bg-gray-800">
+        <div style="position: relative; overflow: hidden; border-radius: 0.75rem; border: 1px solid var(--glass-border); padding: 2rem 1.75rem; background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur)); box-shadow: var(--glass-shadow);"
+            >
             <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #f59e0b, #d97706);"></div>
             <div style="display: flex; align-items: flex-start; gap: 1rem;">
                 <div style="width: 2.75rem; height: 2.75rem; border-radius: 0.75rem; background: rgba(245,158,11,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
@@ -301,8 +301,8 @@
                 </div>
 
                 {{-- Grouped card --}}
-                <div style="border-radius: 0.75rem; border: 1px solid rgba(255,255,255,0.07); overflow: hidden;"
-                     class="bg-white dark:bg-gray-800">
+                <div style="border-radius: 0.75rem; border: 1px solid var(--glass-border); overflow: hidden; background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur)); -webkit-backdrop-filter: blur(var(--glass-blur)); box-shadow: var(--glass-shadow);"
+                    >
                     @foreach ($group['sections'] as $index => $section)
                         <div
                             x-show="matches('{{ $section['title'] }}')"

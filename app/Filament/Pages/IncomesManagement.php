@@ -25,10 +25,17 @@ class IncomesManagement extends Page
 
     protected string $view = 'filament.pages.incomes-management';
 
-    public string $activeTab = 'fixed';
+    public static function getNavigationItemActiveRoutePattern(): string|array
+    {
+        return [
+            static::getRouteName(),
+            'filament.app.resources.fixed-incomes.*',
+            'filament.app.resources.variable-incomes.*',
+        ];
+    }
 
     public function mount(): void
     {
-        $this->activeTab = request()->query('tab', 'fixed');
+        $this->redirect(route('filament.app.resources.fixed-incomes.index'));
     }
 }

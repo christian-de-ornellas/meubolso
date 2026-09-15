@@ -25,10 +25,17 @@ class ExpensesManagement extends Page
 
     protected string $view = 'filament.pages.expenses-management';
 
-    public string $activeTab = 'fixed';
+    public static function getNavigationItemActiveRoutePattern(): string|array
+    {
+        return [
+            static::getRouteName(),
+            'filament.app.resources.fixed-expenses.*',
+            'filament.app.resources.variable-expenses.*',
+        ];
+    }
 
     public function mount(): void
     {
-        $this->activeTab = request()->query('tab', 'fixed');
+        $this->redirect(route('filament.app.resources.fixed-expenses.index'));
     }
 }
