@@ -16,7 +16,7 @@ $inactiveStyle = "border-radius: 9999px; padding: 12px 32px;";
     :style="{{ $alpineActive }}
         ? '{{ $activeStyle }}'
         : '{{ $inactiveStyle }}'"
-    class="whitespace-nowrap text-sm font-semibold transition-all duration-200 ease-in-out"
+    class="inline-flex items-center whitespace-nowrap text-sm font-semibold transition-all duration-200 ease-in-out"
     :class="{{ $alpineActive }} ? '' : 'text-gray-600 hover:bg-white/30 dark:text-gray-400 dark:hover:bg-white/5'"
     {{ $attributes }}
 >
@@ -26,7 +26,7 @@ $inactiveStyle = "border-radius: 9999px; padding: 12px 32px;";
 <a
     href="{{ $href }}"
     style="{{ $active ? $activeStyle : $inactiveStyle }}"
-    class="whitespace-nowrap text-sm font-semibold transition-all duration-200 ease-in-out {{ !$active ? 'text-gray-600 hover:bg-white/30 dark:text-gray-400 dark:hover:bg-white/5' : '' }}"
+    class="inline-flex items-center whitespace-nowrap text-sm font-semibold transition-all duration-200 ease-in-out {{ !$active ? 'text-gray-600 hover:bg-white/30 dark:text-gray-400 dark:hover:bg-white/5' : '' }}"
     {{ $attributes }}
 >
     {{ $slot }}
