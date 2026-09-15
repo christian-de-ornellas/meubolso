@@ -21,7 +21,6 @@ use App\Filament\Widgets\RecentVariableExpenses;
 use App\Filament\Widgets\RecentVariableIncomes;
 use App\Filament\Widgets\SubscriptionsCostOverview;
 use App\Filament\Widgets\UpcomingFixedExpenses;
-use App\Http\Middleware\SetLocale;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -107,7 +106,6 @@ class AppPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                SetLocale::class,
             ])
             ->authMiddleware([
                 Authenticate::class,
@@ -117,12 +115,6 @@ class AppPanelProvider extends PanelProvider
                     ->label('Tutorial')
                     ->icon('heroicon-o-academic-cap')
                     ->url('/app/tutorial'),
-                MenuItem::make()
-                    ->label(fn () => app()->getLocale() === 'pt_BR' ? 'English' : 'Português')
-                    ->icon('heroicon-o-language')
-                    ->url(fn () => route('locale.switch', [
-                        'locale' => app()->getLocale() === 'pt_BR' ? 'en' : 'pt_BR'
-                    ])),
             ]);
     }
 }
