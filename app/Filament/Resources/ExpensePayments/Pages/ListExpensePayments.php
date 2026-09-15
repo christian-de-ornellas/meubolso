@@ -97,7 +97,9 @@ class ListExpensePayments extends ListRecords
             ExpensePayment::createForVariableExpense($expense, $month, $year);
         }
 
-        $installments = Installment::byMonth($month, $year)->get();
+        $installments = Installment::byMonth($month, $year)
+            ->whereHas('installmentExpense')
+            ->get();
 
         foreach ($installments as $installment) {
             ExpensePayment::createForInstallment($installment, $month, $year);
@@ -107,7 +109,13 @@ class ListExpensePayments extends ListRecords
     protected function getTableQuery(): Builder
     {
         return parent::getTableQuery()
-            ->with(['fixedExpense.category', 'variableExpense.category', 'installment.installmentExpense.category'])
+            ->active()
+            ->with([
+                'fixedExpense.category',
+                'variableExpense.category',
+                'installment.installmentExpense' => fn ($query) => $query->withTrashed(),
+                'installment.installmentExpense.category',
+            ])
             ->when(
                 ! request()->has('tableFilters'),
                 fn (Builder $query) => $query->currentMonth()

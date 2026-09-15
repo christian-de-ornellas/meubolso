@@ -4,9 +4,10 @@ namespace App\Filament\Resources\ExpensePayments\Tables;
 
 use App\Filament\Exports\ExpensePaymentExporter;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ExportBulkAction;
+use Filament\Tables\Actions\BulkAction;
+use Illuminate\Database\Eloquent\Collection;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
@@ -153,7 +154,13 @@ class ExpensePaymentsTable
                 BulkActionGroup::make([
                     ExportBulkAction::make()
                         ->exporter(ExpensePaymentExporter::class),
-                    DeleteBulkAction::make(),
+                    BulkAction::make('dismiss')
+                        ->label('Remover')
+                        ->icon('heroicon-o-trash')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->deselectRecordsAfterCompletion()
+                        ->action(fn (Collection $records) => $records->each->update(['dismissed' => true])),
                 ]),
             ]);
     }

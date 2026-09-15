@@ -23,6 +23,7 @@ class ExpensePayment extends Model
         'year',
         'payment_date',
         'paid',
+        'dismissed',
         'notes',
         'attachment',
     ];
@@ -32,6 +33,7 @@ class ExpensePayment extends Model
         'year' => 'integer',
         'payment_date' => 'date',
         'paid' => 'boolean',
+        'dismissed' => 'boolean',
     ];
 
     public function user(): BelongsTo
@@ -94,6 +96,11 @@ class ExpensePayment extends Model
         $now = now();
 
         return $query->byMonth($now->month, $now->year);
+    }
+
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('dismissed', false);
     }
 
     public function getMonthNameAttribute(): string

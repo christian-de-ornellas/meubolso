@@ -38,6 +38,7 @@ class ExpensePaymentResource extends Resource
             ->where('month', $currentMonth)
             ->where('year', $currentYear)
             ->where('paid', false)
+            ->where('dismissed', false)
             ->count();
 
         return $unpaidCount > 0 ? (string) $unpaidCount : null;
