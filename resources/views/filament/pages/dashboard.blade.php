@@ -1,40 +1,72 @@
 <x-filament-panels::page x-data="{ activeTab: $wire.entangle('activeTab') }">
     <div class="mb-6">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-1">
+        <div
+            style="
+                background: var(--glass-bg);
+                backdrop-filter: blur(var(--glass-blur));
+                -webkit-backdrop-filter: blur(var(--glass-blur));
+                border: 1px solid var(--glass-border);
+                box-shadow: var(--glass-shadow);
+            "
+            class="rounded-2xl p-1.5"
+        >
             <nav class="flex gap-1">
+                {{-- Receitas --}}
                 <button
                     type="button"
                     @click="activeTab = 'receitas'"
-                    :style="activeTab === 'receitas' ? 'background-color: rgb(34, 197, 94); color: white; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border-radius: 9999px; padding: 12px 32px;' : 'border-radius: 9999px; padding: 12px 32px;'"
-                    class="flex-1 whitespace-nowrap text-sm font-semibold transition-all duration-200 ease-in-out"
-                    :class="activeTab !== 'receitas' ? 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700' : ''"
+                    x-on:mouseenter="$el.dataset.hover = 'true'"
+                    x-on:mouseleave="$el.dataset.hover = 'false'"
+                    :style="activeTab === 'receitas'
+                        ? 'background: linear-gradient(135deg, rgb(34, 197, 94), rgb(22, 163, 74)); color: white; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.35), inset 0 1px 0 rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.15);'
+                        : ($el.dataset.hover === 'true' ? 'background: rgba(34, 197, 94, 0.08);' : '')"
+                    class="flex-1 whitespace-nowrap rounded-xl px-6 py-3 text-sm font-semibold transition-all duration-300 ease-out"
+                    :class="activeTab !== 'receitas' ? 'text-gray-600 dark:text-gray-400' : ''"
                 >
                     Receitas
                 </button>
+
+                {{-- Despesas --}}
                 <button
                     type="button"
                     @click="activeTab = 'despesas'"
-                    :style="activeTab === 'despesas' ? 'background-color: rgb(239, 68, 68); color: white; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border-radius: 9999px; padding: 12px 32px;' : 'border-radius: 9999px; padding: 12px 32px;'"
-                    class="flex-1 whitespace-nowrap text-sm font-semibold transition-all duration-200 ease-in-out"
-                    :class="activeTab !== 'despesas' ? 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700' : ''"
+                    x-on:mouseenter="$el.dataset.hover = 'true'"
+                    x-on:mouseleave="$el.dataset.hover = 'false'"
+                    :style="activeTab === 'despesas'
+                        ? 'background: linear-gradient(135deg, rgb(239, 68, 68), rgb(220, 38, 38)); color: white; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35), inset 0 1px 0 rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.15);'
+                        : ($el.dataset.hover === 'true' ? 'background: rgba(239, 68, 68, 0.08);' : '')"
+                    class="flex-1 whitespace-nowrap rounded-xl px-6 py-3 text-sm font-semibold transition-all duration-300 ease-out"
+                    :class="activeTab !== 'despesas' ? 'text-gray-600 dark:text-gray-400' : ''"
                 >
                     Despesas
                 </button>
+
+                {{-- Comparativo --}}
                 <button
                     type="button"
                     @click="activeTab = 'comparativo'"
-                    :style="activeTab === 'comparativo' ? 'background-color: rgb(245, 158, 11); color: white; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border-radius: 9999px; padding: 12px 32px;' : 'border-radius: 9999px; padding: 12px 32px;'"
-                    class="flex-1 whitespace-nowrap text-sm font-semibold transition-all duration-200 ease-in-out"
-                    :class="activeTab !== 'comparativo' ? 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700' : ''"
+                    x-on:mouseenter="$el.dataset.hover = 'true'"
+                    x-on:mouseleave="$el.dataset.hover = 'false'"
+                    :style="activeTab === 'comparativo'
+                        ? 'background: linear-gradient(135deg, rgb(245, 158, 11), rgb(217, 119, 6)); color: white; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35), inset 0 1px 0 rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.15);'
+                        : ($el.dataset.hover === 'true' ? 'background: rgba(245, 158, 11, 0.08);' : '')"
+                    class="flex-1 whitespace-nowrap rounded-xl px-6 py-3 text-sm font-semibold transition-all duration-300 ease-out"
+                    :class="activeTab !== 'comparativo' ? 'text-gray-600 dark:text-gray-400' : ''"
                 >
                     Comparativo
                 </button>
+
+                {{-- Projeção --}}
                 <button
                     type="button"
                     @click="activeTab = 'projecao'"
-                    :style="activeTab === 'projecao' ? 'background-color: rgb(139, 92, 246); color: white; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border-radius: 9999px; padding: 12px 32px;' : 'border-radius: 9999px; padding: 12px 32px;'"
-                    class="flex-1 whitespace-nowrap text-sm font-semibold transition-all duration-200 ease-in-out"
-                    :class="activeTab !== 'projecao' ? 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700' : ''"
+                    x-on:mouseenter="$el.dataset.hover = 'true'"
+                    x-on:mouseleave="$el.dataset.hover = 'false'"
+                    :style="activeTab === 'projecao'
+                        ? 'background: linear-gradient(135deg, rgb(139, 92, 246), rgb(109, 40, 217)); color: white; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.35), inset 0 1px 0 rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.15);'
+                        : ($el.dataset.hover === 'true' ? 'background: rgba(139, 92, 246, 0.08);' : '')"
+                    class="flex-1 whitespace-nowrap rounded-xl px-6 py-3 text-sm font-semibold transition-all duration-300 ease-out"
+                    :class="activeTab !== 'projecao' ? 'text-gray-600 dark:text-gray-400' : ''"
                 >
                     Projeção
                 </button>

@@ -1,0 +1,290 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+/* ============================================
+   MeuBolso — Glassmorphism Theme
+   ============================================ */
+
+/* --- CSS Variables --- */
+:root {
+    --glass-bg: rgba(255, 255, 255, 0.55);
+    --glass-bg-strong: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.45);
+    --glass-blur: 16px;
+    --glass-blur-heavy: 24px;
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+    --amber-glow: rgba(245, 158, 11, 0.25);
+    --amber-glow-strong: rgba(245, 158, 11, 0.4);
+    --amber-accent: rgb(245, 158, 11);
+    --amber-accent-light: rgb(252, 211, 77);
+    --gradient-mesh-1: rgba(245, 158, 11, 0.08);
+    --gradient-mesh-2: rgba(139, 92, 246, 0.06);
+    --gradient-mesh-3: rgba(251, 191, 36, 0.05);
+}
+
+:root.dark {
+    --glass-bg: rgba(17, 24, 39, 0.6);
+    --glass-bg-strong: rgba(17, 24, 39, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-blur: 16px;
+    --glass-blur-heavy: 24px;
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    --amber-glow: rgba(245, 158, 11, 0.15);
+    --amber-glow-strong: rgba(245, 158, 11, 0.3);
+    --amber-accent: rgb(245, 158, 11);
+    --amber-accent-light: rgb(252, 211, 77);
+    --gradient-mesh-1: rgba(245, 158, 11, 0.12);
+    --gradient-mesh-2: rgba(139, 92, 246, 0.08);
+    --gradient-mesh-3: rgba(251, 191, 36, 0.06);
+}
+
+/* --- Page Background: Gradient Mesh --- */
+.fi-body {
+    background:
+        radial-gradient(ellipse at 0% 0%, var(--gradient-mesh-1) 0%, transparent 50%),
+        radial-gradient(ellipse at 100% 0%, var(--gradient-mesh-2) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 100%, var(--gradient-mesh-3) 0%, transparent 50%) !important;
+    background-color: rgb(249, 250, 251) !important;
+    min-height: 100vh;
+}
+
+:root.dark .fi-body {
+    background-color: rgb(3, 7, 18) !important;
+}
+
+/* --- Topbar: Frosted Glass --- */
+.fi-topbar nav {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(var(--glass-blur-heavy)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-blur-heavy)) !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+    box-shadow: var(--glass-shadow) !important;
+}
+
+/* --- Sidebar: Frosted Glass --- */
+.fi-sidebar {
+    background: var(--glass-bg-strong) !important;
+    backdrop-filter: blur(var(--glass-blur-heavy)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-blur-heavy)) !important;
+    border-right: 1px solid var(--glass-border) !important;
+}
+
+/* Sidebar active item amber highlight */
+.fi-sidebar-item-active {
+    background: var(--amber-glow) !important;
+    border-left: 3px solid var(--amber-accent) !important;
+}
+
+.fi-sidebar-item-active .fi-sidebar-item-label {
+    color: var(--amber-accent) !important;
+    font-weight: 600 !important;
+}
+
+.fi-sidebar-item-active .fi-sidebar-item-icon {
+    color: var(--amber-accent) !important;
+}
+
+/* --- Stat Overview Cards: Glass --- */
+.fi-wi-stats-overview-stat {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(var(--glass-blur)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-blur)) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 1rem !important;
+    box-shadow: var(--glass-shadow) !important;
+    transition: all 300ms ease-out !important;
+}
+
+.fi-wi-stats-overview-stat:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        var(--glass-shadow),
+        0 0 20px var(--amber-glow) !important;
+    border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+/* Stats overview container — remove default bg */
+.fi-wi-stats-overview-stat-content {
+    background: transparent !important;
+}
+
+/* --- Chart / Section Containers: Glass --- */
+.fi-section {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(var(--glass-blur)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-blur)) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 1rem !important;
+    box-shadow: var(--glass-shadow) !important;
+    transition: all 300ms ease-out !important;
+    overflow: hidden;
+}
+
+.fi-section:hover {
+    box-shadow:
+        var(--glass-shadow),
+        0 0 15px rgba(245, 158, 11, 0.08) !important;
+}
+
+/* Section header transparent */
+.fi-section-header {
+    background: transparent !important;
+}
+
+/* Section content transparent */
+.fi-section-content-ctn {
+    background: transparent !important;
+    border-top-color: var(--glass-border) !important;
+}
+
+/* --- Tables: Glass --- */
+.fi-ta-ctn {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(var(--glass-blur)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-blur)) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 1rem !important;
+    box-shadow: var(--glass-shadow) !important;
+    overflow: hidden;
+}
+
+/* Table header transparent */
+.fi-ta-header-ctn {
+    background: transparent !important;
+}
+
+/* Table rows */
+.fi-ta-row {
+    background: transparent !important;
+    border-bottom-color: var(--glass-border) !important;
+    transition: background 200ms ease !important;
+}
+
+.fi-ta-row:hover {
+    background: var(--amber-glow) !important;
+}
+
+/* --- Widget containers: Glass --- */
+.fi-wi-chart {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(var(--glass-blur)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-blur)) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 1rem !important;
+    box-shadow: var(--glass-shadow) !important;
+}
+
+/* --- Login / Simple Layout: Glass over gradient --- */
+.fi-simple-layout {
+    background:
+        radial-gradient(ellipse at 20% 50%, var(--gradient-mesh-1) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, var(--gradient-mesh-2) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 80%, var(--gradient-mesh-3) 0%, transparent 50%) !important;
+    background-color: rgb(249, 250, 251) !important;
+}
+
+:root.dark .fi-simple-layout {
+    background-color: rgb(3, 7, 18) !important;
+}
+
+.fi-simple-main {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(var(--glass-blur-heavy)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-blur-heavy)) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 1.5rem !important;
+    box-shadow:
+        var(--glass-shadow),
+        0 0 40px var(--amber-glow) !important;
+}
+
+/* --- Modals: Glass consistency --- */
+.fi-modal-window {
+    background: var(--glass-bg-strong) !important;
+    backdrop-filter: blur(var(--glass-blur-heavy)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-blur-heavy)) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 1.5rem !important;
+    box-shadow: var(--glass-shadow) !important;
+}
+
+/* --- Primary Buttons: Amber glow shadow --- */
+.fi-btn-primary {
+    box-shadow: 0 4px 14px var(--amber-glow-strong) !important;
+    transition: all 200ms ease !important;
+}
+
+.fi-btn-primary:hover {
+    box-shadow: 0 6px 20px var(--amber-glow-strong) !important;
+    transform: translateY(-1px);
+}
+
+/* --- Notifications --- */
+.fi-no-notification {
+    background: var(--glass-bg-strong) !important;
+    backdrop-filter: blur(var(--glass-blur)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-blur)) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 1rem !important;
+}
+
+/* --- Form components: Glass --- */
+.fi-fo-field-wrp {
+    background: transparent !important;
+}
+
+/* --- Dropdown menus: Glass --- */
+.fi-dropdown-panel {
+    background: var(--glass-bg-strong) !important;
+    backdrop-filter: blur(var(--glass-blur-heavy)) !important;
+    -webkit-backdrop-filter: blur(var(--glass-blur-heavy)) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 0.75rem !important;
+}
+
+/* --- Cards within widgets --- */
+.fi-in-repeater-item,
+.fi-fo-component-ctn {
+    background: transparent !important;
+}
+
+/* --- Custom Scrollbar (WebKit) --- */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(245, 158, 11, 0.3);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(245, 158, 11, 0.5);
+}
+
+:root.dark ::-webkit-scrollbar-thumb {
+    background: rgba(245, 158, 11, 0.2);
+}
+
+:root.dark ::-webkit-scrollbar-thumb:hover {
+    background: rgba(245, 158, 11, 0.4);
+}
+
+/* --- Breadcrumbs / Header transparent --- */
+.fi-header {
+    background: transparent !important;
+}
+
+/* --- Tabs inside widgets (if any) --- */
+.fi-tabs {
+    background: transparent !important;
+}
+
+/* --- Info lists within widgets --- */
+.fi-in-entry-wrp {
+    border-color: var(--glass-border) !important;
+}

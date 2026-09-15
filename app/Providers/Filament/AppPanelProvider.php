@@ -54,6 +54,7 @@ class AppPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
+            ->viteTheme('resources/css/filament/app/theme.css')
             ->navigationGroups([
                 NavigationGroup::make('Receitas'),
                 NavigationGroup::make('Despesas'),
