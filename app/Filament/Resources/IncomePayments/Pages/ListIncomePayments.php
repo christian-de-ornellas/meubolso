@@ -79,10 +79,6 @@ class ListIncomePayments extends ListRecords
         $currentMonth = now()->month;
         $currentYear = now()->year;
 
-        if (IncomePayment::byMonth($currentMonth, $currentYear)->exists()) {
-            return;
-        }
-
         $this->generatePaymentsForMonth($currentMonth, $currentYear);
     }
 
