@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class Budget extends Model
 {
@@ -52,14 +53,19 @@ class Budget extends Model
     public function getSpentAttribute(): float
     {
         $fixedExpenses = FixedExpense::where('category_id', $this->category_id)
-            ->active()
+            ->activeInMonth($this->month, $this->year)
             ->sum('amount');
 
         $variableExpenses = VariableExpense::where('category_id', $this->category_id)
             ->byMonth($this->month, $this->year)
             ->sum('amount');
 
-        return (float) ($fixedExpenses + $variableExpenses);
+        $installmentExpenses = Installment::where('user_id', Auth::id())
+            ->byMonth($this->month, $this->year)
+            ->whereHas('installmentExpense', fn ($q) => $q->where('category_id', $this->category_id))
+            ->sum('amount');
+
+        return (float) ($fixedExpenses + $variableExpenses + $installmentExpenses);
     }
 
     public function getPercentageUsedAttribute(): float

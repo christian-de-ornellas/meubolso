@@ -38,6 +38,7 @@ class IncomePaymentResource extends Resource
             ->where('month', $currentMonth)
             ->where('year', $currentYear)
             ->where('received', false)
+            ->where('dismissed', false)
             ->count();
 
         return $unreceivedCount > 0 ? (string) $unreceivedCount : null;

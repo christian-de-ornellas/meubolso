@@ -43,28 +43,30 @@ class CashFlowProjectionChart extends ChartWidget
         $avgVariableExpense = $avgVariableExpense / 3;
         $avgVariableIncome = $avgVariableIncome / 3;
 
-        $fixedIncomeTotal = (float) FixedIncome::active()->sum('amount');
-        $fixedExpenseTotal = (float) FixedExpense::active()->sum('amount');
         $subscriptionMonthly = (float) Subscription::active()->get()->sum(fn ($s) => $s->monthly_equivalent);
 
         for ($i = 0; $i < 6; $i++) {
             $month = $now->copy()->addMonths($i);
             $labels[] = $month->translatedFormat('M/Y');
 
-            $installmentsMonth = (float) Installment::unpaid()
-                ->byMonth($month->month, $month->year)
+            $fixedIncomeMonth = (float) FixedIncome::activeInMonth($month->month, $month->year)->sum('amount');
+            $fixedExpenseMonth = (float) FixedExpense::activeInMonth($month->month, $month->year)->sum('amount');
+
+            $installmentsMonth = (float) Installment::byMonth($month->month, $month->year)
+                ->whereHas('installmentExpense')
                 ->sum('amount');
 
-            $projectedIncome = $fixedIncomeTotal + $avgVariableIncome;
-            $projectedExpense = $fixedExpenseTotal + $avgVariableExpense + $subscriptionMonthly + $installmentsMonth;
+            $projectedIncome = $fixedIncomeMonth + $avgVariableIncome;
+            $projectedExpense = $fixedExpenseMonth + $avgVariableExpense + $subscriptionMonthly + $installmentsMonth;
             $projected[] = round($projectedIncome - $projectedExpense, 2);
 
             // Realizado: só para meses passados e atual
             if ($month->lte($now->endOfMonth())) {
-                $realIncome = (float) FixedIncome::active()->sum('amount')
+                $realIncome = (float) FixedIncome::activeInMonth($month->month, $month->year)->sum('amount')
                     + (float) VariableIncome::byMonth($month->month, $month->year)->sum('amount');
-                $realExpense = (float) FixedExpense::active()->sum('amount')
-                    + (float) VariableExpense::byMonth($month->month, $month->year)->sum('amount');
+                $realExpense = (float) FixedExpense::activeInMonth($month->month, $month->year)->sum('amount')
+                    + (float) VariableExpense::byMonth($month->month, $month->year)->sum('amount')
+                    + $installmentsMonth;
                 $realized[] = round($realIncome - $realExpense, 2);
             } else {
                 $realized[] = null;

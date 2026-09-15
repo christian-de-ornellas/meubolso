@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Models\FixedExpense;
+use App\Models\Installment;
 use App\Models\VariableExpense;
 use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget;
@@ -25,7 +26,11 @@ class FinancialStatsOverview extends StatsOverviewWidget
         $variableExpensesThisMonth = VariableExpense::byMonth($currentMonth, $currentYear)
             ->sum('amount');
 
-        $totalThisMonth = $fixedExpensesThisMonth + $variableExpensesThisMonth;
+        $installmentsThisMonth = Installment::byMonth($currentMonth, $currentYear)
+            ->whereHas('installmentExpense')
+            ->sum('amount');
+
+        $totalThisMonth = $fixedExpensesThisMonth + $variableExpensesThisMonth + $installmentsThisMonth;
 
         $fixedExpensesPrevMonth = FixedExpense::activeInMonth($previousMonth, $previousYear)
             ->sum('amount');
@@ -33,7 +38,11 @@ class FinancialStatsOverview extends StatsOverviewWidget
         $variableExpensesPrevMonth = VariableExpense::byMonth($previousMonth, $previousYear)
             ->sum('amount');
 
-        $totalPrevMonth = $fixedExpensesPrevMonth + $variableExpensesPrevMonth;
+        $installmentsPrevMonth = Installment::byMonth($previousMonth, $previousYear)
+            ->whereHas('installmentExpense')
+            ->sum('amount');
+
+        $totalPrevMonth = $fixedExpensesPrevMonth + $variableExpensesPrevMonth + $installmentsPrevMonth;
 
         $difference = $totalThisMonth - $totalPrevMonth;
 

@@ -100,6 +100,7 @@ class ListIncomePayments extends ListRecords
     protected function getTableQuery(): Builder
     {
         return parent::getTableQuery()
+            ->active()
             ->with(['fixedIncome.incomeCategory', 'variableIncome.incomeCategory'])
             ->when(
                 ! request()->has('tableFilters'),

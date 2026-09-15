@@ -8,6 +8,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 class UpcomingFixedExpenses extends TableWidget
 {
@@ -95,13 +96,12 @@ class UpcomingFixedExpenses extends TableWidget
                         return 'success';
                     }),
             ])
-            ->defaultSort(fn ($query) => $query->orderByRaw('
-                CASE
-                    WHEN (CAST(strftime("%d", start_date) AS INTEGER) - CAST(strftime("%d", "now") AS INTEGER)) >= 0
-                    THEN (CAST(strftime("%d", start_date) AS INTEGER) - CAST(strftime("%d", "now") AS INTEGER))
-                    ELSE (CAST(strftime("%d", start_date) AS INTEGER) - CAST(strftime("%d", "now") AS INTEGER) + 30)
-                END
-            '))
+            ->defaultSort(fn ($query) => $query->orderByRaw(
+                DB::connection()->getDriverName() === 'sqlite'
+                    ? 'CASE WHEN (CAST(strftime("%d", start_date) AS INTEGER) - ?) >= 0 THEN (CAST(strftime("%d", start_date) AS INTEGER) - ?) ELSE (CAST(strftime("%d", start_date) AS INTEGER) - ? + 30) END'
+                    : 'CASE WHEN (DAY(start_date) - ?) >= 0 THEN (DAY(start_date) - ?) ELSE (DAY(start_date) - ? + 30) END',
+                [now()->day, now()->day, now()->day]
+            ))
             ->paginated([5, 10, 25]);
     }
 }

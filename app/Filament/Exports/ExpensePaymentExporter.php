@@ -21,7 +21,13 @@ class ExpensePaymentExporter extends Exporter
                 ->getStateUsing(fn ($record) => $record->expense?->description ?? '-'),
             ExportColumn::make('expense_amount')
                 ->label('Valor')
-                ->getStateUsing(fn ($record) => 'R$ ' . number_format($record->expense?->amount ?? 0, 2, ',', '.')),
+                ->getStateUsing(function ($record) {
+                    $amount = $record->installment_id
+                        ? ($record->installment?->amount ?? 0)
+                        : ($record->expense?->amount ?? 0);
+
+                    return 'R$ ' . number_format($amount, 2, ',', '.');
+                }),
             ExportColumn::make('month')
                 ->label('Mês'),
             ExportColumn::make('year')

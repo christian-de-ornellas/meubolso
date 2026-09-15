@@ -2,13 +2,16 @@
 
 namespace App\Filament\Resources\IncomePayments\Tables;
 
+use App\Filament\Exports\IncomePaymentExporter;
+use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ExportBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
 
 class IncomePaymentsTable
 {
@@ -118,7 +121,15 @@ class IncomePaymentsTable
             ->defaultSort('id', 'asc')
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    ExportBulkAction::make()
+                        ->exporter(IncomePaymentExporter::class),
+                    BulkAction::make('dismiss')
+                        ->label('Remover')
+                        ->icon('heroicon-o-trash')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->deselectRecordsAfterCompletion()
+                        ->action(fn (Collection $records) => $records->each->update(['dismissed' => true])),
                 ]),
             ]);
     }

@@ -4,6 +4,7 @@ namespace App\Filament\Widgets;
 
 use App\Models\FixedExpense;
 use App\Models\FixedIncome;
+use App\Models\Installment;
 use App\Models\VariableExpense;
 use App\Models\VariableIncome;
 use Carbon\Carbon;
@@ -25,7 +26,10 @@ class BalanceStatsOverview extends StatsOverviewWidget
 
         $fixedExpenses = FixedExpense::activeInMonth($currentMonth, $currentYear)->sum('amount');
         $variableExpenses = VariableExpense::byMonth($currentMonth, $currentYear)->sum('amount');
-        $totalExpenses = $fixedExpenses + $variableExpenses;
+        $installmentExpenses = Installment::byMonth($currentMonth, $currentYear)
+            ->whereHas('installmentExpense')
+            ->sum('amount');
+        $totalExpenses = $fixedExpenses + $variableExpenses + $installmentExpenses;
 
         $balance = $totalIncomes - $totalExpenses;
 

@@ -4,6 +4,7 @@ namespace App\Filament\Widgets;
 
 use App\Models\ExpensePayment;
 use App\Models\FixedExpense;
+use App\Models\Installment;
 use App\Models\VariableExpense;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -19,10 +20,22 @@ class MonthlyPaymentSummary extends StatsOverviewWidget
 
         $totalFixedExpenses = FixedExpense::activeInMonth($currentMonth, $currentYear)->sum('amount');
         $totalVariableExpenses = VariableExpense::byMonth($currentMonth, $currentYear)->sum('amount');
-        $totalExpenses = $totalFixedExpenses + $totalVariableExpenses;
+        $totalInstallments = Installment::byMonth($currentMonth, $currentYear)
+            ->whereHas('installmentExpense')
+            ->sum('amount');
+        $totalExpenses = $totalFixedExpenses + $totalVariableExpenses + $totalInstallments;
 
-        $payments = ExpensePayment::currentMonth()->with(['fixedExpense', 'variableExpense'])->get();
-        $totalPaid = $payments->where('paid', true)->sum(fn ($payment) => $payment->expense?->amount ?? 0);
+        $payments = ExpensePayment::currentMonth()
+            ->active()
+            ->with(['fixedExpense', 'variableExpense', 'installment'])
+            ->get();
+        $totalPaid = $payments->where('paid', true)->sum(function ($payment) {
+            if ($payment->installment_id) {
+                return $payment->installment?->amount ?? 0;
+            }
+
+            return $payment->expense?->amount ?? 0;
+        });
         $totalToPay = $totalExpenses - $totalPaid;
         $percentagePaid = $totalExpenses > 0 ? ($totalPaid / $totalExpenses) * 100 : 0;
 

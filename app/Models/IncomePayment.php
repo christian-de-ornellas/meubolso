@@ -20,6 +20,7 @@ class IncomePayment extends Model
         'year',
         'payment_date',
         'received',
+        'dismissed',
         'notes',
     ];
 
@@ -28,6 +29,7 @@ class IncomePayment extends Model
         'year' => 'integer',
         'payment_date' => 'date',
         'received' => 'boolean',
+        'dismissed' => 'boolean',
     ];
 
     public function user(): BelongsTo
@@ -69,6 +71,11 @@ class IncomePayment extends Model
     public function scopeUnreceived(Builder $query): Builder
     {
         return $query->where('received', false);
+    }
+
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('dismissed', false);
     }
 
     public function scopeCurrentMonth(Builder $query): Builder
