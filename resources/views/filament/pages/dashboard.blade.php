@@ -9,7 +9,7 @@
                     :style="activeTab === 'receitas'
                         ? 'background-color: rgb(34, 197, 94); color: white; box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.08); border-radius: 9999px; padding: 12px 32px;'
                         : 'border-radius: 9999px; padding: 12px 32px;'"
-                    class="flex-1 text-center whitespace-nowrap text-sm font-semibold transition-all duration-200 ease-in-out"
+                    class="whitespace-nowrap text-sm font-semibold transition-all duration-200 ease-in-out"
                     :class="activeTab !== 'receitas' ? 'text-gray-600 hover:bg-white/30 dark:text-gray-400 dark:hover:bg-white/5' : ''"
                 >
                     Receitas
@@ -22,7 +22,7 @@
                     :style="activeTab === 'despesas'
                         ? 'background-color: rgb(239, 68, 68); color: white; box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.08); border-radius: 9999px; padding: 12px 32px;'
                         : 'border-radius: 9999px; padding: 12px 32px;'"
-                    class="flex-1 text-center whitespace-nowrap text-sm font-semibold transition-all duration-200 ease-in-out"
+                    class="whitespace-nowrap text-sm font-semibold transition-all duration-200 ease-in-out"
                     :class="activeTab !== 'despesas' ? 'text-gray-600 hover:bg-white/30 dark:text-gray-400 dark:hover:bg-white/5' : ''"
                 >
                     Despesas
@@ -35,7 +35,7 @@
                     :style="activeTab === 'comparativo'
                         ? 'background-color: rgb(245, 158, 11); color: white; box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.08); border-radius: 9999px; padding: 12px 32px;'
                         : 'border-radius: 9999px; padding: 12px 32px;'"
-                    class="flex-1 text-center whitespace-nowrap text-sm font-semibold transition-all duration-200 ease-in-out"
+                    class="whitespace-nowrap text-sm font-semibold transition-all duration-200 ease-in-out"
                     :class="activeTab !== 'comparativo' ? 'text-gray-600 hover:bg-white/30 dark:text-gray-400 dark:hover:bg-white/5' : ''"
                 >
                     Comparativo
@@ -48,7 +48,7 @@
                     :style="activeTab === 'projecao'
                         ? 'background-color: rgb(139, 92, 246); color: white; box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.08); border-radius: 9999px; padding: 12px 32px;'
                         : 'border-radius: 9999px; padding: 12px 32px;'"
-                    class="flex-1 text-center whitespace-nowrap text-sm font-semibold transition-all duration-200 ease-in-out"
+                    class="whitespace-nowrap text-sm font-semibold transition-all duration-200 ease-in-out"
                     :class="activeTab !== 'projecao' ? 'text-gray-600 hover:bg-white/30 dark:text-gray-400 dark:hover:bg-white/5' : ''"
                 >
                     Projeção
