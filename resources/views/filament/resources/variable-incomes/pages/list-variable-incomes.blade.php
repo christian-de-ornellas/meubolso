@@ -1,6 +1,6 @@
 <x-filament-panels::page>
     <div class="mb-6">
-        <div class="glass-tab-nav rounded-xl p-1">
+        <div class="glass-tab-nav w-fit rounded-xl p-1">
             <nav class="flex gap-1">
                 <a
                     href="{{ route('filament.app.resources.fixed-incomes.index') }}"
