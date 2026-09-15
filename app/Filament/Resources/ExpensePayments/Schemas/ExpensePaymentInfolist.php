@@ -13,9 +13,32 @@ class ExpensePaymentInfolist
         return $schema
             ->components([
                 TextEntry::make('user.name')
-                    ->label('User'),
-                TextEntry::make('fixedExpense.id')
-                    ->label('Fixed expense'),
+                    ->label('Usuário'),
+                TextEntry::make('expense_type')
+                    ->label('Tipo'),
+                TextEntry::make('fixedExpense.description')
+                    ->label('Despesa Fixa')
+                    ->visible(fn ($record) => $record->fixed_expense_id !== null)
+                    ->placeholder('-'),
+                TextEntry::make('variableExpense.description')
+                    ->label('Despesa Variável')
+                    ->visible(fn ($record) => $record->variable_expense_id !== null)
+                    ->placeholder('-'),
+                TextEntry::make('installment_detail')
+                    ->label('Parcela')
+                    ->getStateUsing(function ($record) {
+                        if (! $record->installment_id) {
+                            return null;
+                        }
+                        $installment = $record->installment;
+                        $expense = $installment?->installmentExpense;
+
+                        return $expense
+                            ? "{$expense->description} - Parcela {$installment->installment_number}/{$expense->installment_count}"
+                            : '-';
+                    })
+                    ->visible(fn ($record) => $record->installment_id !== null)
+                    ->placeholder('-'),
                 TextEntry::make('month')
                     ->numeric(),
                 TextEntry::make('year')

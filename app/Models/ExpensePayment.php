@@ -17,6 +17,7 @@ class ExpensePayment extends Model
         'user_id',
         'fixed_expense_id',
         'variable_expense_id',
+        'installment_id',
         'account_id',
         'month',
         'year',
@@ -48,6 +49,11 @@ class ExpensePayment extends Model
         return $this->belongsTo(VariableExpense::class);
     }
 
+    public function installment(): BelongsTo
+    {
+        return $this->belongsTo(Installment::class);
+    }
+
     public function account(): BelongsTo
     {
         return $this->belongsTo(Account::class);
@@ -55,11 +61,15 @@ class ExpensePayment extends Model
 
     public function getExpenseAttribute()
     {
-        return $this->fixedExpense ?? $this->variableExpense;
+        return $this->fixedExpense ?? $this->variableExpense ?? $this->installment?->installmentExpense;
     }
 
     public function getExpenseTypeAttribute(): string
     {
+        if ($this->installment_id) {
+            return 'Parcelamento';
+        }
+
         return $this->fixed_expense_id ? 'Fixa' : 'Variável';
     }
 
@@ -137,6 +147,21 @@ class ExpensePayment extends Model
             ],
             [
                 'paid' => false,
+            ]
+        );
+    }
+
+    public static function createForInstallment(Installment $installment, int $month, int $year): ExpensePayment
+    {
+        return static::firstOrCreate(
+            [
+                'user_id' => Auth::id(),
+                'installment_id' => $installment->id,
+                'month' => $month,
+                'year' => $year,
+            ],
+            [
+                'paid' => $installment->paid,
             ]
         );
     }

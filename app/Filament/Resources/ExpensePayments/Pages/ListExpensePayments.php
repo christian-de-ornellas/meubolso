@@ -5,6 +5,7 @@ namespace App\Filament\Resources\ExpensePayments\Pages;
 use App\Filament\Resources\ExpensePayments\ExpensePaymentResource;
 use App\Models\ExpensePayment;
 use App\Models\FixedExpense;
+use App\Models\Installment;
 use App\Models\VariableExpense;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
@@ -79,10 +80,6 @@ class ListExpensePayments extends ListRecords
         $currentMonth = now()->month;
         $currentYear = now()->year;
 
-        if (ExpensePayment::byMonth($currentMonth, $currentYear)->exists()) {
-            return;
-        }
-
         $this->generatePaymentsForMonth($currentMonth, $currentYear);
     }
 
@@ -99,12 +96,18 @@ class ListExpensePayments extends ListRecords
         foreach ($variableExpenses as $expense) {
             ExpensePayment::createForVariableExpense($expense, $month, $year);
         }
+
+        $installments = Installment::byMonth($month, $year)->get();
+
+        foreach ($installments as $installment) {
+            ExpensePayment::createForInstallment($installment, $month, $year);
+        }
     }
 
     protected function getTableQuery(): Builder
     {
         return parent::getTableQuery()
-            ->with(['fixedExpense.category', 'variableExpense.category'])
+            ->with(['fixedExpense.category', 'variableExpense.category', 'installment.installmentExpense.category'])
             ->when(
                 ! request()->has('tableFilters'),
                 fn (Builder $query) => $query->currentMonth()

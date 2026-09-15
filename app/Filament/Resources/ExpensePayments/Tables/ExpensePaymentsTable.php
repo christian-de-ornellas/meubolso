@@ -22,18 +22,35 @@ class ExpensePaymentsTable
                 TextColumn::make('expense_type')
                     ->label('Tipo')
                     ->badge()
-                    ->color(fn (string $state): string => $state === 'Fixa' ? 'info' : 'warning')
+                    ->color(fn (string $state): string => match ($state) {
+                        'Fixa' => 'info',
+                        'Parcelamento' => 'success',
+                        default => 'warning',
+                    })
                     ->sortable(),
 
                 TextColumn::make('expense_description')
                     ->label('Despesa')
-                    ->getStateUsing(fn ($record) => $record->expense?->description ?? '-')
+                    ->getStateUsing(function ($record) {
+                        if ($record->installment_id) {
+                            $expense = $record->installment?->installmentExpense;
+                            $number = $record->installment?->installment_number;
+                            $total = $expense?->installment_count;
+
+                            return $expense ? "{$expense->description} {$number}/{$total}" : '-';
+                        }
+
+                        return $record->expense?->description ?? '-';
+                    })
                     ->searchable(query: function ($query, $search) {
                         return $query->where(function ($query) use ($search) {
                             $query->whereHas('fixedExpense', function ($query) use ($search) {
                                 $query->where('description', 'like', "%{$search}%");
                             })
                             ->orWhereHas('variableExpense', function ($query) use ($search) {
+                                $query->where('description', 'like', "%{$search}%");
+                            })
+                            ->orWhereHas('installment.installmentExpense', function ($query) use ($search) {
                                 $query->where('description', 'like', "%{$search}%");
                             });
                         });
@@ -48,7 +65,13 @@ class ExpensePaymentsTable
 
                 TextColumn::make('expense_amount')
                     ->label('Valor')
-                    ->getStateUsing(fn ($record) => $record->expense?->amount ?? 0)
+                    ->getStateUsing(function ($record) {
+                        if ($record->installment_id) {
+                            return $record->installment?->amount ?? 0;
+                        }
+
+                        return $record->expense?->amount ?? 0;
+                    })
                     ->money('BRL')
                     ->sortable(),
 
@@ -56,13 +79,19 @@ class ExpensePaymentsTable
                     ->label('Pago')
                     ->sortable()
                     ->beforeStateUpdated(function ($record, $state) {
-                        // Quando marcar como pago, definir data de pagamento automaticamente
                         if ($state && !$record->payment_date) {
                             $record->payment_date = now();
                         }
-                        // Quando desmarcar, limpar data de pagamento
                         if (!$state) {
                             $record->payment_date = null;
+                        }
+                    })
+                    ->afterStateUpdated(function ($record, $state) {
+                        if ($record->installment_id && $record->installment) {
+                            $record->installment->update([
+                                'paid' => $state,
+                                'payment_date' => $state ? now() : null,
+                            ]);
                         }
                     }),
 

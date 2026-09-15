@@ -21,14 +21,21 @@ class ExpensePaymentForm
                     ->options([
                         'fixed' => 'Despesa Fixa',
                         'variable' => 'Despesa Variável',
+                        'installment' => 'Parcela',
                     ])
-                    ->default(fn ($record) => $record?->fixed_expense_id ? 'fixed' : 'variable')
+                    ->default(function ($record) {
+                        if ($record?->installment_id) {
+                            return 'installment';
+                        }
+
+                        return $record?->fixed_expense_id ? 'fixed' : 'variable';
+                    })
                     ->required()
                     ->live()
                     ->afterStateUpdated(function ($state, callable $set) {
-                        // Limpar campos ao trocar tipo
                         $set('fixed_expense_id', null);
                         $set('variable_expense_id', null);
+                        $set('installment_id', null);
                     })
                     ->dehydrated(false)
                     ->columnSpanFull(),
@@ -49,6 +56,22 @@ class ExpensePaymentForm
                     ->preload()
                     ->visible(fn ($get) => $get('expense_type') === 'variable')
                     ->required(fn ($get) => $get('expense_type') === 'variable')
+                    ->columnSpanFull(),
+
+                Select::make('installment_id')
+                    ->label('Parcela')
+                    ->relationship('installment', 'id')
+                    ->getOptionLabelFromRecordUsing(function ($record) {
+                        $expense = $record->installmentExpense;
+
+                        return $expense
+                            ? "{$expense->description} - Parcela {$record->installment_number}/{$expense->installment_count}"
+                            : "Parcela #{$record->id}";
+                    })
+                    ->searchable()
+                    ->preload()
+                    ->visible(fn ($get) => $get('expense_type') === 'installment')
+                    ->required(fn ($get) => $get('expense_type') === 'installment')
                     ->columnSpanFull(),
 
                 Select::make('month')
